@@ -1,154 +1,119 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>mohd-murad-khan</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>RIFTBOUND: Chaos Frontier</title>
 <style>
-:root{--ink:#18324a;--gold:#ffd34d}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#102a43;color:white;font-family:system-ui,Segoe UI,Arial;touch-action:none}
-canvas{display:block;width:100vw;height:100dvh;touch-action:none}
-#hud{position:fixed;top:10px;left:10px;right:10px;display:flex;gap:7px;align-items:center;justify-content:space-between;pointer-events:none;flex-wrap:wrap}
-.stat{background:#102e45d9;border:2px solid #ffffff80;border-radius:15px;padding:6px 10px;font-size:13px;font-weight:900;text-shadow:0 1px 2px #000}
-#levelbar{position:fixed;top:53px;left:12px;right:12px;height:8px;background:#153c50;border:1px solid #ffffff80;border-radius:9px;overflow:hidden;pointer-events:none}
-#progress{height:100%;width:0;background:linear-gradient(90deg,#ffe35b,#ff9c2e)}
-#controls{position:fixed;left:0;right:0;bottom:max(14px,env(safe-area-inset-bottom));display:flex;justify-content:space-between;align-items:end;padding:0 16px;pointer-events:none}
-.pad{display:flex;gap:10px}.ctrl{pointer-events:auto;width:66px;height:66px;border:2px solid #ffffffb8;border-radius:21px;background:#153c57d9;color:#fff;font-weight:1000;font-size:26px;box-shadow:0 5px 0 #092437;touch-action:none;user-select:none;-webkit-user-select:none}
-#jump{width:82px;height:82px;border-radius:50%;background:#f09a2b;font-size:16px}
-#fire{width:64px;height:64px;border-radius:50%;background:#d94b38;font-size:13px}
-#pause{position:fixed;right:12px;top:91px;width:42px;height:42px;border:2px solid #fff9;border-radius:14px;background:#153c57d9;color:white;font-weight:900}
-#overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;background:linear-gradient(#071a2bb8,#071a2be8);overflow:auto}
-.panel{width:min(520px,100%);max-height:94dvh;overflow:auto;background:linear-gradient(155deg,#24795d,#14384e 78%);border:3px solid #ffffffa8;border-radius:25px;padding:22px;text-align:center;box-shadow:0 18px 55px #0009}
-h1{font-size:clamp(27px,7vw,42px);line-height:1.08;margin:3px 0 8px}h2{margin:5px 0 8px}.sub{color:#e4fff0;line-height:1.45;margin:8px 0 15px}
-.big{border:0;border-radius:15px;background:var(--gold);color:#3c2b06;padding:13px 22px;font-size:18px;font-weight:1000;box-shadow:0 5px 0 #a87915}
-.secondary{border:2px solid #ffffff80;border-radius:13px;background:#ffffff17;color:#fff;padding:10px 14px;font-weight:800}
-.row{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:12px}
-.worlds{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
-.world{border:2px solid #ffffff65;border-radius:15px;padding:12px 5px;background:#ffffff12;font-weight:900}
-.world.locked{opacity:.38}.world b{display:block;font-size:27px}
-.tiny{font-size:12px;opacity:.86;line-height:1.5;margin-top:12px}
-@media(min-width:850px){#controls{padding:0 35px}.ctrl{opacity:.8}}
-</style>
-</head>
+:root{--ink:#f4f7ff;--muted:#aebbd5;--panel:rgba(9,15,34,.88);--line:rgba(255,255,255,.16);--cyan:#4de7ff;--gold:#ffd45a}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#070b18;color:var(--ink);font-family:system-ui,Segoe UI,Arial}
+#game{display:block;width:100vw;height:100vh;touch-action:none;background:#101a35}
+#hud{position:fixed;inset:12px 12px auto;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;gap:10px}
+.pill{background:rgba(4,9,23,.72);border:1px solid var(--line);border-radius:14px;padding:8px 12px;backdrop-filter:blur(8px);font-weight:800;text-shadow:0 2px 3px #000}
+#stats{display:flex;gap:7px;flex-wrap:wrap}#bossbar{position:fixed;top:76px;left:50%;transform:translateX(-50%);width:min(420px,75vw);display:none}
+.bar{height:12px;border:1px solid #fff8;background:#1a2036;border-radius:20px;overflow:hidden}.fill{height:100%;width:100%;background:linear-gradient(90deg,#ff426f,#ffb44d)}
+#bossname{text-align:center;font-size:12px;letter-spacing:2px;font-weight:900;margin-bottom:5px;text-shadow:0 2px 3px #000}
+#overlay{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(130deg,rgba(4,8,20,.8),rgba(9,17,40,.68));padding:18px}
+.panel{width:min(780px,96vw);max-height:92vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:clamp(18px,4vw,34px);box-shadow:0 25px 100px #0009}
+.eyebrow{color:var(--cyan);font-weight:1000;letter-spacing:4px;font-size:12px}
+h1{font-size:clamp(34px,7vw,66px);line-height:.94;margin:10px 0;background:linear-gradient(90deg,#fff,#68edff 45%,#b28aff);-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{margin:0 0 8px;font-size:26px}.sub{color:var(--muted);line-height:1.5;max-width:650px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+button{border:1px solid #ffffff2c;color:white;background:#1c2a4b;padding:12px 17px;border-radius:12px;font-weight:900;font-size:14px;cursor:pointer}
+button.primary{background:linear-gradient(100deg,#00b8d8,#6756ec);border:0;box-shadow:0 8px 25px #00c5ef35}
+button:hover{filter:brightness(1.18);transform:translateY(-1px)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin-top:16px}
+.tile{border:1px solid var(--line);background:#ffffff09;border-radius:14px;padding:12px}
+.tile b{display:block;margin-bottom:4px}.tile span{font-size:12px;color:var(--muted)}
+#mobile{position:fixed;bottom:16px;left:14px;right:14px;display:none;justify-content:space-between;align-items:end;pointer-events:none}
+.pad,.jump{display:flex;gap:9px;pointer-events:auto}.touch{width:58px;height:58px;border-radius:18px;background:#081329b8;border:1px solid #ffffff55;font-size:22px;touch-action:none;user-select:none}
+.jump .touch{width:68px;height:68px;border-radius:50%;background:#492a85c9}
+#toast{position:fixed;top:23%;left:50%;transform:translateX(-50%);font-size:clamp(18px,3vw,28px);font-weight:1000;text-align:center;text-shadow:0 3px 8px #000;pointer-events:none;opacity:0;transition:opacity .2s}
+#help{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);font-size:11px;color:#d4def0a8;text-align:center;pointer-events:none}
+@media(max-width:700px){#mobile{display:flex}#help{bottom:92px}.panel{padding:20px}}
+</style></head>
 <body>
 <canvas id="game"></canvas>
-<div id="hud">
- <div class="stat">🪙 <span id="coins">0</span></div>
- <div class="stat">❤️ <span id="hearts">3</span></div>
- <div class="stat">⭐ <span id="stars">0</span></div>
- <div class="stat" id="worldname">🌿 GREEN HILLS · 1-1</div>
+<div id="hud"><div class="pill" id="worldLabel">RIFTBOUND</div><div id="stats"><div class="pill" id="hp">❤❤❤</div><div class="pill" id="shards">◆ 0</div><div class="pill" id="power">POWER: NONE</div><div class="pill" id="level">LEVEL 1/25</div></div></div>
+<div id="bossbar"><div id="bossname">BOSS</div><div class="bar"><div class="fill" id="bossfill"></div></div></div>
+<div id="toast"></div><div id="help">MOVE: A/D or ←/→ · JUMP: SPACE/W/↑ · DASH: SHIFT · ATTACK: J · SPECIAL: K · PAUSE: P</div>
+<div id="mobile"><div class="pad"><button class="touch" data-key="left">◀</button><button class="touch" data-key="right">▶</button></div><div class="jump"><button class="touch" data-key="dash">⚡</button><button class="touch" data-key="attack">✦</button><button class="touch" data-key="jump">⬆</button></div></div>
+<div id="overlay"><div class="panel" id="menu">
+<div class="eyebrow">A BRAND-NEW ADVENTURE</div><h1>RIFTBOUND:<br>CHAOS FRONTIER</h1>
+<p class="sub">A fractured universe. Five worlds. Five colossal guardians. Master new powers, uncover hidden routes, and fight your way to the heart of the rift.</p>
+<div class="grid">
+<div class="tile"><b>🌿 Verdant Wilds</b><span>Living vines, spring pads & thorn beasts</span></div>
+<div class="tile"><b>🔥 Ember Foundry</b><span>Lava lifts, forge drones & fire storms</span></div>
+<div class="tile"><b>🌊 Sunken Kingdom</b><span>Water currents, bubble jumps & deep-sea foes</span></div>
+<div class="tile"><b>⚡ Neon Skyline</b><span>Gravity gates, lasers & cyber hunters</span></div>
+<div class="tile"><b>🌌 The Rift Core</b><span>Shifting platforms & reality-bending bosses</span></div>
 </div>
-<div id="levelbar"><div id="progress"></div></div>
-<button id="pause">Ⅱ</button>
-<div id="controls">
- <div class="pad"><button class="ctrl" id="left">◀</button><button class="ctrl" id="right">▶</button></div>
- <div class="pad"><button class="ctrl" id="fire">FIRE</button><button class="ctrl" id="jump">JUMP</button></div>
-</div>
-<div id="overlay"><div class="panel" id="panel"></div></div>
+<div class="actions"><button class="primary" id="start">START NEW GAME</button><button id="continue">CONTINUE</button><button id="controls">HOW TO PLAY</button></div>
+<p class="sub" style="font-size:12px;margin-top:18px">25 handcrafted-style stages · 5 boss battles · 5 unlockable powers · secrets, shards, checkpoints and touch controls.</p>
+</div></div>
 <script>
 (()=>{
-const canvas=document.querySelector('canvas'),c=canvas.getContext('2d');
-let W=innerWidth,H=innerHeight,dpr=1,cam=0,last=0,mode='menu',coins=0,hearts=3,stars=0,worldIndex=0,levelIndex=0,world,level,player,plats=[],foes=[],loot=[],powerups=[],shots=[],particles=[],checkpoint=0,levelStart=0,boss=null,shake=0;
-const worlds=[
- {name:'GREEN HILLS',icon:'🌿',sky:['#61c9f0','#d7f7ff'],hill:'#83d88c',ground:'#399d48',dirt:'#8b5736',accent:'#ffd34d'},
- {name:'SUNSET DESERT',icon:'🏜️',sky:['#f6a45f','#ffe0a2'],hill:'#dca35c',ground:'#c58a38',dirt:'#87512d',accent:'#ffdf70'},
- {name:'FROSTY PEAKS',icon:'❄️',sky:['#65b9df','#e6f8ff'],hill:'#a6d9e9',ground:'#6ba7b8',dirt:'#547b91',accent:'#b9f4ff'}
-];
-const levelsPerWorld=4;
-const el=id=>document.getElementById(id);
-function resize(){dpr=Math.min(2,devicePixelRatio||1);canvas.width=innerWidth*dpr;canvas.height=innerHeight*dpr;W=innerWidth;H=innerHeight;c.setTransform(dpr,0,0,dpr,0,0);if(mode==='play')draw()}
-addEventListener('resize',resize);resize();
-function panel(html){el('panel').innerHTML=html;el('overlay').style.display='flex'}
-function hidePanel(){el('overlay').style.display='none'}
-function menu(){
- mode='menu';
- panel(`<div style="font-size:48px">🧭🌟🏃</div><h1>mohd-murad-khan</h1><h2>QUEST FOR THE STAR</h2><p class="sub">Explore huge worlds, find secret treasure, power up, defeat monsters and collect the magic stars!</p><div class="worlds"><div class="world"><b>🌿</b>Green Hills</div><div class="world"><b>🏜️</b>Sunset Desert</div><div class="world"><b>❄️</b>Frosty Peaks</div></div><p>🎮 12 levels · 3 worlds · boss battles · power-ups</p><button class="big" id="start">START ADVENTURE</button><div class="tiny">Mobile: ◀ ▶ to move · JUMP to leap · FIRE to shoot<br>Computer: A/D or arrows · Space/W to jump · X to fire</div>`);
- el('start').onclick=()=>{worldIndex=0;levelIndex=0;coins=0;hearts=3;stars=0;loadLevel();hidePanel();mode='play';last=performance.now();requestAnimationFrame(loop)};
-}
-function makeLevel(){
- const w=worlds[worldIndex],idx=levelIndex,base=H-82,finish=3000+idx*260;
- plats=[{x:0,y:base,w:finish+300,h:130,ground:true}];
- const gaps=[[360,90],[790,110],[1320,95],[1880,110],[2440,100]];
- gaps.forEach(([x,g])=>{plats[0]});
- // floating platforms and stepping stones
- for(let i=0;i<11+idx;i++){let x=220+i*245+(i%3)*35,y=base-(85+(i%4)*34);plats.push({x,y,w:105+(i%2)*35,h:18});}
- // raised bridges over some sections
- for(let i=0;i<4;i++){let x=540+i*690;plats.push({x,y:base-45-(i%2)*25,w:125,h:18})}
- foes=[];for(let i=0;i<8+idx;i++){let x=430+i*330;foes.push({x,home:x,y:base-27,r:17,v:i%2? -1:1,hp:1,alive:true,type:i%4===3?'spike':'slime'})}
- loot=[];for(let i=0;i<35;i++){let x=170+i*91,y=base-48-(i%5===2?125:0);loot.push({x,y,taken:false})}
- powerups=[{x:640,y:base-130,type:'mushroom',taken:false},{x:1530,y:base-165,type:'shield',taken:false},{x:2200,y:base-150,type:'star',taken:false}];
- boss=idx===levelsPerWorld-1?{x:finish-330,y:base-46,hp:12,max:12,dir:1,active:false,flash:0}:null;
- level={width:finish+100,base,finish};levelStart=player?player.x:70;checkpoint=70;
- player={x:70,y:base-55,w:34,h:50,vx:0,vy:0,on:false,face:1,inv:0,shield:0,power:'none',powerTime:0,fireCooldown:0,anim:0};
- cam=0;shots=[];particles=[];updateHud();
-}
-function loadLevel(){world=worlds[worldIndex];makeLevel();el('worldname').textContent=`${world.icon} ${world.name} · ${worldIndex+1}-${levelIndex+1}`;draw()}
-function updateHud(){el('coins').textContent=coins;el('hearts').textContent=hearts;el('stars').textContent=stars;el('progress').style.width=(player?Math.min(100,player.x/level.width*100):0)+'%'}
-const input={left:false,right:false,jump:false,fire:false};
-function bind(id,k){let b=el(id);let dn=e=>{e.preventDefault();input[k]=true};let up=e=>{e.preventDefault();input[k]=false};b.addEventListener('pointerdown',dn);['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev,up))}
-bind('left','left');bind('right','right');bind('jump','jump');bind('fire','fire');
-addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight',' ','ArrowUp','a','d','A','D','w','W','x','X'].includes(e.key))e.preventDefault();if(['ArrowLeft','a','A'].includes(e.key))input.left=true;if(['ArrowRight','d','D'].includes(e.key))input.right=true;if([' ','ArrowUp','w','W'].includes(e.key))input.jump=true;if(['x','X'].includes(e.key))input.fire=true});
-addEventListener('keyup',e=>{if(['ArrowLeft','a','A'].includes(e.key))input.left=false;if(['ArrowRight','d','D'].includes(e.key))input.right=false;if([' ','ArrowUp','w','W'].includes(e.key))input.jump=false;if(['x','X'].includes(e.key))input.fire=false});
-el('pause').onclick=()=>{if(mode!=='play')return;mode='pause';panel(`<h1>⏸️ Paused</h1><p class="sub">Take a breather, adventurer.</p><div class="row"><button class="big" id="resume">RESUME</button><button class="secondary" id="quit">LEVEL SELECT</button></div>`);el('resume').onclick=()=>{hidePanel();mode='play';last=performance.now();requestAnimationFrame(loop)};el('quit').onclick=worldSelect};
-function worldSelect(){mode='select';panel(`<h1>🗺️ Choose a world</h1><p class="sub">Your adventure has only just begun!</p><div class="worlds">${worlds.map((w,i)=>`<button class="world ${i>worldIndex?'locked':''}" data-w="${i}" ${i>worldIndex?'disabled':''}><b>${w.icon}</b>${w.name}</button>`).join('')}</div><button class="secondary" id="back">BACK</button>`);document.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{worldIndex=+b.dataset.w;levelIndex=0;loadLevel();hidePanel();mode='play';last=performance.now();requestAnimationFrame(loop)});el('back').onclick=()=>{hidePanel();mode='play';last=performance.now();requestAnimationFrame(loop)}}
-function levelComplete(){mode='complete';stars++;updateHud();panel(`<div style="font-size:52px">🏆</div><h1>LEVEL CLEAR!</h1><p class="sub">You found the path through ${world.name}. Coins collected: ${coins} · Stars: ${stars}</p><button class="big" id="next">NEXT LEVEL ➜</button><div class="tiny">Your progress continues in the next stage.</div>`);el('next').onclick=()=>{if(levelIndex<levelsPerWorld-1)levelIndex++;else if(worldIndex<worlds.length-1){worldIndex++;levelIndex=0}else{gameWon();return}loadLevel();hidePanel();mode='play';last=performance.now();requestAnimationFrame(loop)}}
-function gameWon(){mode='won';panel(`<div style="font-size:55px">👑🌟</div><h1>YOU SAVED THE KINGDOM!</h1><p class="sub">All three worlds conquered. You collected ${coins} coins and earned ${stars} stars. Legendary adventuring!</p><button class="big" id="again">PLAY AGAIN</button>`);el('again').onclick=menu}
-function gameOver(){mode='over';panel(`<div style="font-size:48px">💫</div><h1>ADVENTURE OVER</h1><p class="sub">The monsters were tough! Try the level again and watch your jumps.</p><button class="big" id="retry">RETRY LEVEL</button><div class="row"><button class="secondary" id="select">WORLD SELECT</button></div>`);el('retry').onclick=()=>{hearts=3;loadLevel();hidePanel();mode='play';last=performance.now();requestAnimationFrame(loop)};el('select').onclick=worldSelect}
-function burst(x,y,color,n=8){for(let i=0;i<n;i++)particles.push({x,y,vx:(Math.random()-.5)*220,vy:-Math.random()*220,life:.5,color})}
-function hurt(){if(player.inv>0)return;if(player.shield>0){player.shield=0;player.inv=1.2;burst(player.x,player.y,'#73eaff',12);return}hearts--;updateHud();player.inv=1.5;player.vy=-300;player.x=Math.max(checkpoint,player.x-85);if(hearts<=0)gameOver()}
-function shoot(){if(player.fireCooldown>0)return;player.fireCooldown=.42;shots.push({x:player.x+player.w/2+player.face*20,y:player.y+25,vx:player.face*470,life:1.3})}
-function update(dt){
- const p=player,base=level.base;p.anim+=dt*10;p.vx=((input.right?1:0)-(input.left?1:0))*260;if(p.vx)p.face=Math.sign(p.vx);
- if(input.jump&&p.on){p.vy=-555;p.on=false;burst(p.x+17,p.y+48,'#fff2a6',3)}
- p.vy+=1250*dt;let old=p.y;p.x=Math.max(0,Math.min(level.width-p.w,p.x+p.vx*dt));p.y+=p.vy*dt;p.on=false;
- for(const q of plats)if(p.x+p.w>q.x&&p.x<q.x+q.w&&old+p.h<=q.y+9&&p.y+p.h>=q.y&&p.vy>=0){p.y=q.y-p.h;p.vy=0;p.on=true}
- if(p.y>H+100){hurt();p.y=base-150;p.vy=0}
- p.inv=Math.max(0,p.inv-dt);p.shield=Math.max(0,p.shield-dt);p.powerTime=Math.max(0,p.powerTime-dt);p.fireCooldown=Math.max(0,p.fireCooldown-dt);
- if(p.powerTime===0&&p.power!=='none')p.power='none';
- for(const l of loot)if(!l.taken&&Math.abs(p.x+17-l.x)<24&&Math.abs(p.y+24-l.y)<28){l.taken=true;coins++;burst(l.x,l.y,'#ffd34d',5)}
- for(const u of powerups)if(!u.taken&&Math.abs(p.x+17-u.x)<27&&Math.abs(p.y+25-u.y)<32){u.taken=true;if(u.type==='mushroom'){p.power='big';p.powerTime=15;p.vy=-260}else if(u.type==='shield')p.shield=10;else{p.power='star';p.powerTime=8}burst(u.x,u.y,'#fff',14)}
- if(input.fire&&p.power!=='none')shoot();
- for(const e of foes)if(e.alive){e.x+=e.v*95*dt;if(e.x<e.home-95||e.x>e.home+95)e.v*=-1;if(p.x+p.w>e.x-17&&p.x<e.x+17&&p.y+p.h>e.y-17&&p.y<e.y+13){if(p.vy>90&&p.y+p.h<e.y+15){e.alive=false;p.vy=-390;coins+=2;burst(e.x,e.y,'#cba4ff',12)}else hurt()}}
- if(boss){if(p.x>level.finish-700)boss.active=true;if(boss.active){boss.x+=boss.dir*105*dt;if(boss.x<level.finish-500||boss.x>level.finish-140)boss.dir*=-1;if(boss.flash>0)boss.flash-=dt;if(p.x+p.w>boss.x-40&&p.x<boss.x+40&&p.y+p.h>boss.y-35&&p.y<boss.y+20){if(p.vy>80&&p.y+p.h<boss.y+22){boss.hp-=2;p.vy=-430;boss.flash=.18;burst(boss.x,boss.y,'#ffcf48',13)}else hurt()}for(const s of shots){if(Math.abs(s.x-boss.x)<35&&Math.abs(s.y-boss.y)<40){boss.hp--;s.life=0;boss.flash=.15;burst(boss.x,boss.y,'#ffcf48',8)}}if(boss.hp<=0){burst(boss.x,boss.y,'#ffd34d',35);boss=null;coins+=20}}}
- for(const s of shots){s.x+=s.vx*dt;s.life-=dt;for(const e of foes)if(e.alive&&Math.abs(s.x-e.x)<22&&Math.abs(s.y-e.y)<26){e.alive=false;s.life=0;burst(e.x,e.y,'#cba4ff',9)}}shots=shots.filter(s=>s.life>0);
- for(const a of particles){a.x+=a.vx*dt;a.y+=a.vy*dt;a.vy+=500*dt;a.life-=dt}particles=particles.filter(a=>a.life>0);
- if(p.x>checkpoint+650)checkpoint=p.x-120;
- if(p.x+p.w>level.finish&&(!boss||boss.hp<=0)){levelComplete();return}
- cam=Math.max(0,Math.min(level.width-W,p.x-W*.38));updateHud();
-}
-function rr(x,y,w,h,r,color){c.fillStyle=color;c.beginPath();c.roundRect(x,y,w,h,r);c.fill()}
-function draw(){
- c.clearRect(0,0,W,H);let g=world.sky,grad=c.createLinearGradient(0,0,0,H);grad.addColorStop(0,g[0]);grad.addColorStop(1,g[1]);c.fillStyle=grad;c.fillRect(0,0,W,H);
- // sun and clouds
- c.fillStyle='#fff8';for(let i=0;i<6;i++){let x=((i*310-cam*.18)%(W+240)+W+240)%(W+240)-100,y=75+(i%3)*50;c.beginPath();c.arc(x,y,18,0,7);c.arc(x+24,y-9,26,0,7);c.arc(x+51,y,18,0,7);c.fill()}
- c.fillStyle=world.hill;for(let i=0;i<10;i++){let x=((i*360-cam*.32)%(W+400)+W+400)%(W+400)-180;c.beginPath();c.arc(x,level.base+15,155,Math.PI,0);c.fill()}
- // platforms
- for(const q of plats){let x=q.x-cam;if(x+q.w<0||x>W)continue;rr(x,q.y,q.w,q.h,5,world.dirt);rr(x,q.y,q.w,9,4,world.ground);c.fillStyle='#ffffff22';for(let a=12;a<q.w-10;a+=29)c.fillRect(x+a,q.y+12,12,3)}
- // coins
- for(const l of loot)if(!l.taken){let x=l.x-cam;if(x>-20&&x<W+20){c.fillStyle=world.accent;c.beginPath();c.ellipse(x,l.y,9,13,0,0,7);c.fill();c.strokeStyle='#fff5b5';c.lineWidth=2;c.stroke()}}
- // powerups
- for(const u of powerups)if(!u.taken){let x=u.x-cam;c.font='27px system-ui';c.textAlign='center';c.fillText(u.type==='mushroom'?'🍄':u.type==='shield'?'🛡️':'⭐',x,u.y+10)}
- // enemies
- for(const e of foes)if(e.alive){let x=e.x-cam;c.fillStyle=e.type==='spike'?'#b94a4a':'#8450c7';c.beginPath();c.ellipse(x,e.y,18,15,0,0,7);c.fill();c.fillStyle='white';c.fillRect(x-9,e.y-5,5,6);c.fillRect(x+4,e.y-5,5,6);c.fillStyle='#18263a';c.fillRect(x-7,e.y-3,2,3);c.fillRect(x+6,e.y-3,2,3)}
- // boss
- if(boss){let x=boss.x-cam;rr(x-39,boss.y-34,78,55,18,boss.flash>0?'#fff':'#9d3f50');c.fillStyle='#fff';c.fillRect(x-19,boss.y-19,10,12);c.fillRect(x+9,boss.y-19,10,12);c.fillStyle='#1c2535';c.fillRect(x-16,boss.y-15,4,7);c.fillRect(x+12,boss.y-15,4,7);rr(x-45,boss.y-52,90,9,4,'#3a202c');rr(x-45,boss.y-52,90*boss.hp/boss.max,9,4,'#ff5252');c.fillStyle='#fff';c.font='bold 11px system-ui';c.textAlign='center';c.fillText('MEGA SLIME',x,boss.y-59)}
- // flag
- let fx=level.finish-cam;c.fillStyle='#69472c';c.fillRect(fx,level.base-140,9,140);c.fillStyle='#ffdc45';c.beginPath();c.moveTo(fx+9,level.base-140);c.lineTo(fx+75,level.base-119);c.lineTo(fx+9,level.base-97);c.fill();
- // shots
- for(const s of shots){c.fillStyle='#ff7043';c.beginPath();c.arc(s.x-cam,s.y,8,0,7);c.fill();c.fillStyle='#ffe58a';c.beginPath();c.arc(s.x-cam,s.y,4,0,7);c.fill()}
- // player
- let p=player,x=p.x-cam,y=p.y;if(p.inv>0&&Math.floor(performance.now()/90)%2===0)c.globalAlpha=.45;
- if(p.shield>0){c.strokeStyle='#70eaff';c.lineWidth=4;c.beginPath();c.arc(x+17,y+25,32,0,7);c.stroke()}
- if(p.power==='star'){c.shadowColor='#ffe34c';c.shadowBlur=18}
- let ht=p.power==='big'?60:50;rr(x+4,y+17,p.w-8,ht-20,8,'#e99a43');rr(x+7,y+3,p.w-14,25,8,'#f3c49b');rr(x+2,y,30,10,5,'#704020');c.fillStyle='#26374d';c.fillRect(x+(p.face>0?23:9),y+12,4,6);rr(x+5,y+ht-13,25,12,4,'#2e68b1');rr(x+2,y+ht-4,14,7,3,'#56331e');rr(x+20,y+ht-4,14,7,3,'#56331e');c.shadowBlur=0;c.globalAlpha=1;
- // particles
- for(const a of particles){c.globalAlpha=Math.max(0,a.life*2);c.fillStyle=a.color;c.fillRect(a.x-cam,a.y,5,5)}c.globalAlpha=1;
- // boss hint
- if(boss&&boss.active){c.fillStyle='#321b2cbb';rr(W/2-95,69,190,25,10,'#321b2cbb');c.fillStyle='white';c.font='bold 12px system-ui';c.textAlign='center';c.fillText('BOSS HEALTH',W/2,86)}
-}
-function loop(t){if(mode!=='play')return;let dt=Math.min(.032,(t-last)/1000);last=t;update(dt);draw();if(mode==='play')requestAnimationFrame(loop)}
-menu();draw();
+const c=document.getElementById('game'),ctx=c.getContext('2d'),overlay=document.getElementById('overlay'),menu=document.getElementById('menu');
+let W=innerWidth,H=innerHeight,dpr=1;function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;c.width=W*dpr;c.height=H*dpr;c.style.width=W+'px';c.style.height=H+'px';ctx.setTransform(dpr,0,0,dpr,0,0)}addEventListener('resize',resize);resize();
+const themes=[['Verdant Wilds','#123d3c','#35c978','#8cf0a6'],['Ember Foundry','#4a1d26','#f06b3b','#ffc45b'],['Sunken Kingdom','#102e55','#28b9d3','#8af2f4'],['Neon Skyline','#20184b','#9b59ff','#54f4ff'],['The Rift Core','#25123f','#d04dff','#ffe17b']];
+const powers=[['WIND DASH','A burst that cuts through danger.'],['FLAME ORB','Launch a blazing projectile.'],['TIDAL GUARD','A shield that absorbs one hit.'],['GRAVITY FLIP','Leap higher and float briefly.'],['RIFT NOVA','Blast nearby enemies with a shockwave.']];
+const bossNames=['THORN TITAN','MAGMA COLOSSUS','ABYSSAL QUEEN','VOLT OVERLORD','THE NULL KING'];
+let level=0,world=0,cam=0,score=0,shards=0,lives=3,paused=false,started=false,frame=0,toastTimer=0,checkpoint=0,projectiles=[],particles=[],enemies=[],platforms=[],items=[],boss=null,exitX=0,keys={},touch={},player;
+const saved=()=>{try{localStorage.setItem('riftbound-save',JSON.stringify({level,score,shards,lives}))}catch(e){}};
+function load(){try{return JSON.parse(localStorage.getItem('riftbound-save')||'null')}catch(e){return null}}
+function say(s){let t=document.getElementById('toast');t.textContent=s;t.style.opacity=1;toastTimer=100}
+function fresh(){level=0;score=0;shards=0;lives=3;checkpoint=0;beginLevel()}
+function beginLevel(){world=Math.floor(level/5);let stage=level%5;cam=0;frame=0;projectiles=[];particles=[];enemies=[];items=[];boss=null;paused=false;
+let width=2400+stage*180;exitX=width-120;platforms=[{x:0,y:H-65,w:width,h:100,type:'ground'}];
+for(let i=0;i<Math.floor(width/240);i++){let x=230+i*240+Math.sin(i*2+level)*35,y=H-145-(i%3)*47;platforms.push({x,y,w:110+(i%2)*30,h:18,type:'platform'});if(i%2===0)items.push({x:x+48,y:y-35,type:'shard',got:false});}
+for(let i=0;i<7+stage;i++){let x=400+i*230+Math.random()*80;enemies.push({x,y:H-100,hp:2+world,type:world,dir:Math.random()<.5?-1:1,alive:true,base:x});}
+if(stage===4){boss={x:width-420,y:H-180,hp:18+world*8,max:18+world*8,phase:0,hit:0,attack:0};}
+for(let i=0;i<3;i++)items.push({x:650+i*570,y:H-110,type:'coin',got:false});
+if(stage===1||stage===3)items.push({x:width*.55,y:H-210,type:'power',got:false});
+player={x:70,y:H-150,vx:0,vy:0,w:32,h:46,hp:3,maxHp:3,ground:false,face:1,power:Math.max(0,world-1),powerTime:0,invul:0,dash:0,attack:0,special:0,respawn:70};
+document.getElementById('worldLabel').textContent=themes[world][0].toUpperCase();document.getElementById('level').textContent=`LEVEL ${level+1}/25`;document.getElementById('bossbar').style.display=boss?'block':'none';updateHud();saved();}
+function updateHud(){document.getElementById('hp').textContent='❤'.repeat(Math.max(0,player?.hp||0))+'♡'.repeat(Math.max(0,3-(player?.hp||0)));document.getElementById('shards').textContent='◆ '+shards;document.getElementById('power').textContent='POWER: '+(player&&player.power>=0?powers[player.power][0]:'NONE');}
+function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(x,y,w,h)}
+function circle(x,y,r,color){ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+function burst(x,y,color,n=10){for(let i=0;i<n;i++)particles.push({x,y,vx:(Math.random()-.5)*7,vy:(Math.random()-.7)*7,life:30,color})}
+function hit(){if(player.invul>0)return;player.hp--;player.invul=90;player.vy=-7;burst(player.x+16,player.y+20,'#ff5777',15);updateHud();if(player.hp<=0){lives--;if(lives<=0){gameOver()}else{player.hp=3;player.x=70;player.y=H-180;player.vx=player.vy=0;say('TRY AGAIN · '+lives+' LIVES LEFT')}}}
+function gameOver(){paused=true;overlay.style.display='grid';menu.innerHTML='<div class="eyebrow">THE RIFT STILL WAITS</div><h1>RUN ENDED</h1><p class="sub">You collected '+shards+' rift shards and reached stage '+(level+1)+'. Take a breath and jump back in.</p><div class="actions"><button class="primary" id="retry">RESTART RUN</button><button id="home">MAIN MENU</button></div>';document.getElementById('retry').onclick=()=>{fresh();overlay.style.display='none';paused=false};document.getElementById('home').onclick=showMenu}
+function showMenu(){overlay.style.display='grid';menu.innerHTML='<div class="eyebrow">A BRAND-NEW ADVENTURE</div><h1>RIFTBOUND:<br>CHAOS FRONTIER</h1><p class="sub">Five worlds. Five colossal guardians. Master new powers and fight your way to the heart of the rift.</p><div class="actions"><button class="primary" id="start">START NEW GAME</button><button id="continue">CONTINUE</button><button id="controls">HOW TO PLAY</button></div><p class="sub" style="font-size:12px">25 stages · 5 bosses · 5 powers · secrets and checkpoints.</p>';document.getElementById('start').onclick=()=>{fresh();overlay.style.display='none';started=true};document.getElementById('continue').onclick=()=>{let s=load();if(s){level=Math.min(24,s.level);score=s.score||0;shards=s.shards||0;lives=s.lives||3;beginLevel();overlay.style.display='none';started=true}else say('NO SAVE FOUND YET')};document.getElementById('controls').onclick=()=>{menu.innerHTML='<h2>HOW TO PLAY</h2><p class="sub">Move with A/D or arrows. Jump with SPACE, W or ↑. Press SHIFT to dash, J to attack and K for your world power. On phones, use the on-screen buttons. Collect rift shards, grab power cores, defeat the guardian at the end of each world, then enter the portal.</p><div class="actions"><button class="primary" id="back">GOT IT</button></div>';document.getElementById('back').onclick=showMenu}}
+function action(k){if(!started||paused)return;if(k==='jump'&&player.ground){player.vy=-13.5;player.ground=false;burst(player.x+16,player.y+45,'#d9faff',4)}if(k==='dash'&&player.dash<=0){player.dash=13;player.vx=player.face*15;burst(player.x+16,player.y+20,themes[world][3],9)}if(k==='attack'&&player.attack<=0){player.attack=18;if(player.power===1||player.power===4){projectiles.push({x:player.x+player.w/2,y:player.y+20,vx:player.face*9,life:75,power:player.power})}else{enemies.forEach(e=>{if(e.alive&&Math.abs(e.x-player.x)<75&&Math.abs(e.y-player.y)<80){e.hp-=2;burst(e.x,e.y,'#fff',7);if(e.hp<=0){e.alive=false;score+=100}}});if(boss&&Math.abs(boss.x-player.x)<100&&Math.abs(boss.y-player.y)<100){boss.hp-=2;boss.hit=12}}}if(k==='special'&&player.special<=0){player.special=240;let radius=world===4?250:145;enemies.forEach(e=>{if(e.alive&&Math.abs(e.x-player.x)<radius){e.hp-=4;if(e.hp<=0)e.alive=false}});if(boss&&Math.abs(boss.x-player.x)<radius)boss.hp-=world===4?5:3;burst(player.x+16,player.y+20,themes[world][3],35);say(powers[world][0]+'!')}}
+addEventListener('keydown',e=>{let k=e.key.toLowerCase();keys[k]=true;if([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k))e.preventDefault();if(k===' '||k==='w'||k==='arrowup')action('jump');if(k==='shift')action('dash');if(k==='j')action('attack');if(k==='k')action('special');if(k==='p'){paused=!paused;say(paused?'PAUSED':'RESUMED')}});
+addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+document.querySelectorAll('[data-key]').forEach(b=>{let k=b.dataset.key;b.addEventListener('pointerdown',e=>{e.preventDefault();touch[k]=true;if(['jump','dash','attack'].includes(k))action(k)});['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev,()=>touch[k]=false))});
+function update(){if(!started||paused)return;frame++;let left=keys.a||keys.arrowleft||touch.left,right=keys.d||keys.arrowright||touch.right;if(player.dash<=0){if(left){player.vx-=.8;player.face=-1}if(right){player.vx+=.8;player.face=1}player.vx*=.82;player.vx=Math.max(-5.2,Math.min(5.2,player.vx))}else player.dash--;
+player.vy+=.62;if(player.power===3&&player.powerTime>0)player.vy*=.94;player.x+=player.vx;player.y+=player.vy;player.ground=false;
+for(let p of platforms){if(player.x+player.w>p.x&&player.x<p.x+p.w&&player.y+player.h>=p.y&&player.y+player.h<=p.y+Math.max(18,player.vy+5)&&player.vy>=0){player.y=p.y-player.h;player.vy=0;player.ground=true}}
+if(player.x<0)player.x=0;if(player.y>H+120){hit();player.x=Math.max(70,player.x-100);player.y=H-220;player.vy=0}
+if(player.invul>0)player.invul--;if(player.powerTime>0)player.powerTime--;if(player.attack>0)player.attack--;if(player.special>0)player.special--;
+for(let e of enemies){if(!e.alive)continue;e.x+=e.dir*(1.1+world*.25);if(Math.abs(e.x-e.base)>85)e.dir*=-1;if(Math.abs(player.x-e.x)<28&&Math.abs(player.y-e.y)<42){if(player.vy>2&&player.y+player.h<e.y+22){e.hp-=2;player.vy=-8;if(e.hp<=0){e.alive=false;score+=100}}else hit()}}
+for(let it of items){if(it.got)continue;if(Math.abs(player.x+16-it.x)<25&&Math.abs(player.y+22-it.y)<35){it.got=true;if(it.type==='shard'){shards++;score+=25;burst(it.x,it.y,'#ffe36e',8)}else if(it.type==='coin'){score+=50;burst(it.x,it.y,'#ffd45a',8)}else{player.power=world;player.powerTime=9999;player.hp=Math.min(3,player.hp+1);say('POWER UNLOCKED: '+powers[world][0]);burst(it.x,it.y,themes[world][3],20)}updateHud()}}
+for(let p of projectiles){p.x+=p.vx;p.life--;for(let e of enemies)if(e.alive&&Math.abs(e.x-p.x)<28){e.hp-=2;p.life=0;if(e.hp<=0){e.alive=false;score+=100}}if(boss&&Math.abs(boss.x-p.x)<55){boss.hp-=2;p.life=0}}
+projectiles=projectiles.filter(p=>p.life>0);
+if(boss){boss.attack++;boss.x+=Math.sin(frame*.025)*.8;if(boss.attack%100===0){let dx=player.x-boss.x,dy=player.y-boss.y;let mag=Math.hypot(dx,dy)||1;projectiles.push({x:boss.x,y:boss.y+25,vx:dx/mag*4,vy:dy/mag*2,life:100,enemy:true})}if(Math.abs(player.x-boss.x)<65&&Math.abs(player.y-boss.y)<80)hit();document.getElementById('bossname').textContent=bossNames[world]+' · '+Math.ceil(boss.hp)+' HP';document.getElementById('bossfill').style.width=Math.max(0,boss.hp/boss.max*100)+'%';if(boss.hp<=0){boss=null;document.getElementById('bossbar').style.display='none';score+=1500;say('GUARDIAN DEFEATED! POWER CORE CLAIMED');shards+=10;updateHud();saved()}}
+for(let p of projectiles)if(p.enemy){p.x+=p.vx;p.y+=p.vy;if(Math.abs(player.x-p.x)<25&&Math.abs(player.y-p.y)<35){hit();p.life=0}}projectiles=projectiles.filter(p=>p.life>0);
+for(let p of particles){p.x+=p.vx;p.y+=p.vy;p.vy+=.12;p.life--}particles=particles.filter(p=>p.life>0);
+if(player.x>exitX&&(!boss)){level++;if(level>=25){victory();return}beginLevel();say('WORLD '+(world+1)+' · STAGE '+(level+1));}
+cam=Math.max(0,Math.min(exitX-W*.65,player.x-W*.32));if(toastTimer>0){toastTimer--;if(toastTimer===0)document.getElementById('toast').style.opacity=0}if(frame%180===0)saved();updateHud()}
+function victory(){paused=true;overlay.style.display='grid';menu.innerHTML='<div class="eyebrow">THE RIFT IS STABLE</div><h1>YOU ARE THE<br>RIFTBOUND!</h1><p class="sub">You conquered all five worlds, defeated every guardian and brought balance back to the frontier. Final score: '+score+'. Rift shards: '+shards+'.</p><div class="actions"><button class="primary" id="again">PLAY AGAIN</button></div>';document.getElementById('again').onclick=()=>{fresh();overlay.style.display='none';paused=false;started=true}}
+function draw(){let t=themes[world],grad=ctx.createLinearGradient(0,0,0,H);grad.addColorStop(0,t[1]);grad.addColorStop(1,'#080d20');rect(0,0,W,H,grad);
+for(let i=0;i<7;i++){let x=((i*230-cam*.22)%(W+250)+W+250)%(W+250)-100;circle(x,100+(i%3)*60,55+i%3*20,t[2]+'22')}
+ctx.save();ctx.translate(-cam,0);
+for(let p of platforms){rect(p.x,p.y,p.w,p.h,p.type==='ground'?t[2]:'#33456b');rect(p.x,p.y,p.w,5,t[3])}
+for(let it of items)if(!it.got){let color=it.type==='shard'?'#ffe36e':it.type==='coin'?'#ffd45a':t[3];circle(it.x,it.y, it.type==='power'?14:8,color);if(it.type==='power'){ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.strokeRect(it.x-10,it.y-10,20,20)}}
+for(let e of enemies)if(e.alive){circle(e.x,e.y+16,17,world===0?'#a7ef66':world===1?'#ff744f':world===2?'#54d9ee':world===3?'#b57aff':'#f06bff');circle(e.x-6,e.y+12,3,'#101326');circle(e.x+6,e.y+12,3,'#101326')}
+if(boss){ctx.fillStyle=t[3];ctx.beginPath();ctx.roundRect(boss.x-42,boss.y,84,100,18);ctx.fill();rect(boss.x-27,boss.y+27,12,7,'#160f2a');rect(boss.x+15,boss.y+27,12,7,'#160f2a');rect(boss.x-20,boss.y+68,40,6,'#160f2a')}
+for(let p of projectiles){circle(p.x,p.y,p.enemy?8:7,p.enemy?'#ff5477':'#fff19a')}
+for(let p of particles){ctx.globalAlpha=Math.max(0,p.life/30);circle(p.x,p.y,3,p.color);ctx.globalAlpha=1}
+if(player){if(!(player.invul>0&&frame%8<4)){ctx.fillStyle='#f4f7ff';ctx.beginPath();ctx.roundRect(player.x,player.y,player.w,player.h,9);ctx.fill();rect(player.x+(player.face===1?19:6),player.y+13,7,7,'#26304f');rect(player.x+5,player.y+34,10,12,'#26304f');rect(player.x+19,player.y+34,9,12,'#26304f');if(player.power>=0){ctx.strokeStyle=t[3];ctx.lineWidth=3;ctx.strokeRect(player.x-4,player.y-4,player.w+8,player.h+8)}if(player.attack>0){ctx.strokeStyle='#fff';ctx.lineWidth=5;ctx.beginPath();ctx.arc(player.x+16+player.face*25,player.y+24,22,-1,1);ctx.stroke()}}}
+ctx.restore();
+if(!paused&&started){rect(W-145,H-18,130,4,'#ffffff22');rect(W-145,H-18,130*Math.min(1,player.x/exitX),4,t[3])}
+requestAnimationFrame(draw)}
+function loop(){update();requestAnimationFrame(loop)}
+document.getElementById('start').onclick=()=>{fresh();overlay.style.display='none';started=true};
+document.getElementById('continue').onclick=()=>{let s=load();if(s){level=Math.min(24,s.level);score=s.score||0;shards=s.shards||0;lives=s.lives||3;beginLevel();overlay.style.display='none';started=true}else say('NO SAVE FOUND YET')};
+document.getElementById('controls').onclick=()=>{menu.innerHTML='<h2>HOW TO PLAY</h2><p class="sub">Move: A/D or arrows · Jump: Space/W/↑ · Dash: Shift · Attack: J · Special: K · Pause: P. Touch buttons work on phones and tablets. Collect shards, grab power cores, defeat each world guardian and reach the portal.</p><div class="actions"><button class="primary" id="back">GOT IT</button></div>';document.getElementById('back').onclick=showMenu};
+beginLevel();loop();draw();
 })();
-</script>
-</body>
-</html>
+</script></body></html>
