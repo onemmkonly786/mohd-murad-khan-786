@@ -2,81 +2,152 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Little Adventurer — Green Grass World</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>mohd-murad-khan</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#142b43;font-family:system-ui,Arial;color:#fff;touch-action:none}
-#game{display:block;width:100vw;height:100dvh;background:#79d7f2;touch-action:none}
-#hud{position:fixed;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none;font-weight:800;text-shadow:0 2px 3px #245}
-.pill{background:#153b36c9;border:2px solid #ffffff70;border-radius:18px;padding:7px 12px;font-size:14px}
-#controls{position:fixed;left:0;right:0;bottom:18px;display:flex;justify-content:space-between;align-items:end;padding:0 20px;pointer-events:none}
-.pad{display:flex;gap:12px}.control{pointer-events:auto;width:68px;height:68px;border:3px solid #fff9;border-radius:22px;background:#163d54b9;color:white;font-size:28px;font-weight:900;box-shadow:0 5px 0 #09283b;touch-action:none;user-select:none}
-#jump{width:82px;height:82px;border-radius:50%;background:#ed8b27d9;font-size:17px}
-#overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#061b2bbd;padding:20px}
-.panel{max-width:440px;width:100%;background:linear-gradient(160deg,#246c58,#143c4c);border:3px solid #ffffffa8;border-radius:24px;padding:25px;text-align:center;box-shadow:0 15px 45px #0008}
-.panel h1{font-size:clamp(28px,7vw,42px);margin:0 0 8px}.panel p{line-height:1.5;color:#e5fff3}.panel button{border:0;border-radius:16px;background:#ffd34e;color:#392b08;padding:14px 25px;font-size:19px;font-weight:900;box-shadow:0 5px 0 #b37d16}
-.small{font-size:12px;opacity:.85;margin-top:14px}
-@media(min-width:800px){#controls{padding:0 42px;bottom:25px}.control{opacity:.75}}
+:root{--ink:#18324a;--gold:#ffd34d}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#102a43;color:white;font-family:system-ui,Segoe UI,Arial;touch-action:none}
+canvas{display:block;width:100vw;height:100dvh;touch-action:none}
+#hud{position:fixed;top:10px;left:10px;right:10px;display:flex;gap:7px;align-items:center;justify-content:space-between;pointer-events:none;flex-wrap:wrap}
+.stat{background:#102e45d9;border:2px solid #ffffff80;border-radius:15px;padding:6px 10px;font-size:13px;font-weight:900;text-shadow:0 1px 2px #000}
+#levelbar{position:fixed;top:53px;left:12px;right:12px;height:8px;background:#153c50;border:1px solid #ffffff80;border-radius:9px;overflow:hidden;pointer-events:none}
+#progress{height:100%;width:0;background:linear-gradient(90deg,#ffe35b,#ff9c2e)}
+#controls{position:fixed;left:0;right:0;bottom:max(14px,env(safe-area-inset-bottom));display:flex;justify-content:space-between;align-items:end;padding:0 16px;pointer-events:none}
+.pad{display:flex;gap:10px}.ctrl{pointer-events:auto;width:66px;height:66px;border:2px solid #ffffffb8;border-radius:21px;background:#153c57d9;color:#fff;font-weight:1000;font-size:26px;box-shadow:0 5px 0 #092437;touch-action:none;user-select:none;-webkit-user-select:none}
+#jump{width:82px;height:82px;border-radius:50%;background:#f09a2b;font-size:16px}
+#fire{width:64px;height:64px;border-radius:50%;background:#d94b38;font-size:13px}
+#pause{position:fixed;right:12px;top:91px;width:42px;height:42px;border:2px solid #fff9;border-radius:14px;background:#153c57d9;color:white;font-weight:900}
+#overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;background:linear-gradient(#071a2bb8,#071a2be8);overflow:auto}
+.panel{width:min(520px,100%);max-height:94dvh;overflow:auto;background:linear-gradient(155deg,#24795d,#14384e 78%);border:3px solid #ffffffa8;border-radius:25px;padding:22px;text-align:center;box-shadow:0 18px 55px #0009}
+h1{font-size:clamp(27px,7vw,42px);line-height:1.08;margin:3px 0 8px}h2{margin:5px 0 8px}.sub{color:#e4fff0;line-height:1.45;margin:8px 0 15px}
+.big{border:0;border-radius:15px;background:var(--gold);color:#3c2b06;padding:13px 22px;font-size:18px;font-weight:1000;box-shadow:0 5px 0 #a87915}
+.secondary{border:2px solid #ffffff80;border-radius:13px;background:#ffffff17;color:#fff;padding:10px 14px;font-weight:800}
+.row{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.worlds{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
+.world{border:2px solid #ffffff65;border-radius:15px;padding:12px 5px;background:#ffffff12;font-weight:900}
+.world.locked{opacity:.38}.world b{display:block;font-size:27px}
+.tiny{font-size:12px;opacity:.86;line-height:1.5;margin-top:12px}
+@media(min-width:850px){#controls{padding:0 35px}.ctrl{opacity:.8}}
 </style>
 </head>
 <body>
 <canvas id="game"></canvas>
-<div id="hud"><div class="pill">🪙 <span id="coins">0</span></div><div class="pill">❤️ <span id="lives">3</span></div><div class="pill">WORLD 1-1</div></div>
-<div id="controls"><div class="pad"><button class="control" id="left" aria-label="Move left">◀</button><button class="control" id="right" aria-label="Move right">▶</button></div><button class="control" id="jump">JUMP</button></div>
-<div id="overlay"><div class="panel"><h1>🌿 Little Adventurer</h1><p>Welcome to the Green Grass World! Run, jump, collect coins and reach the golden flag. Stomp the little slimes from above!</p><button id="start">START ADVENTURE</button><div class="small">Touch ◀ ▶ to move · JUMP to leap<br>Keyboard: A/D or ←/→ · Space to jump</div></div></div>
+<div id="hud">
+ <div class="stat">🪙 <span id="coins">0</span></div>
+ <div class="stat">❤️ <span id="hearts">3</span></div>
+ <div class="stat">⭐ <span id="stars">0</span></div>
+ <div class="stat" id="worldname">🌿 GREEN HILLS · 1-1</div>
+</div>
+<div id="levelbar"><div id="progress"></div></div>
+<button id="pause">Ⅱ</button>
+<div id="controls">
+ <div class="pad"><button class="ctrl" id="left">◀</button><button class="ctrl" id="right">▶</button></div>
+ <div class="pad"><button class="ctrl" id="fire">FIRE</button><button class="ctrl" id="jump">JUMP</button></div>
+</div>
+<div id="overlay"><div class="panel" id="panel"></div></div>
 <script>
 (()=>{
-const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
-let W=0,H=0,dpr=1,camera=0,last=0,playing=false,coins=0,lives=3;
-const uiCoins=document.getElementById('coins'),uiLives=document.getElementById('lives'),overlay=document.getElementById('overlay');
-function resize(){dpr=Math.max(1,Math.min(2,devicePixelRatio||1));canvas.width=Math.floor(innerWidth*dpr);canvas.height=Math.floor(innerHeight*dpr);W=innerWidth;H=innerHeight;ctx.setTransform(dpr,0,0,dpr,0,0)}
-addEventListener('resize',()=>{resize();draw()});resize();
-const worldW=2600,groundY=()=>H-88;
-let player,platforms,coinList,enemies,goal;
-function reset(){
- player={x:70,y:groundY()-52,w:36,h:48,vx:0,vy:0,on:false,inv:0,face:1};
- platforms=[{x:0,y:groundY(),w:worldW,h:100},{x:260,y:groundY()-105,w:130,h:18},{x:475,y:groundY()-165,w:120,h:18},{x:700,y:groundY()-100,w:150,h:18},{x:980,y:groundY()-145,w:145,h:18},{x:1250,y:groundY()-95,w:150,h:18},{x:1530,y:groundY()-165,w:145,h:18},{x:1810,y:groundY()-110,w:150,h:18},{x:2110,y:groundY()-150,w:145,h:18}];
- coinList=[];[[290,groundY()-145],[350,groundY()-145],[500,groundY()-205],[550,groundY()-205],[740,groundY()-140],[800,groundY()-140],[1020,groundY()-185],[1080,groundY()-185],[1300,groundY()-135],[1360,groundY()-135],[1570,groundY()-205],[1630,groundY()-205],[1850,groundY()-150],[1910,groundY()-150],[2150,groundY()-190],[2210,groundY()-190],[2350,groundY()-100]].forEach(([x,y])=>coinList.push({x,y,taken:false}));
- enemies=[600,900,1430,1990].map((x,i)=>({x,home:x,y:groundY()-30,v:i%2? -1:1,alive:true}));
- goal={x:2460,y:groundY()-145};camera=0;coins=0;lives=3;updateHud();
+const canvas=document.querySelector('canvas'),c=canvas.getContext('2d');
+let W=innerWidth,H=innerHeight,dpr=1,cam=0,last=0,mode='menu',coins=0,hearts=3,stars=0,worldIndex=0,levelIndex=0,world,level,player,plats=[],foes=[],loot=[],powerups=[],shots=[],particles=[],checkpoint=0,levelStart=0,boss=null,shake=0;
+const worlds=[
+ {name:'GREEN HILLS',icon:'🌿',sky:['#61c9f0','#d7f7ff'],hill:'#83d88c',ground:'#399d48',dirt:'#8b5736',accent:'#ffd34d'},
+ {name:'SUNSET DESERT',icon:'🏜️',sky:['#f6a45f','#ffe0a2'],hill:'#dca35c',ground:'#c58a38',dirt:'#87512d',accent:'#ffdf70'},
+ {name:'FROSTY PEAKS',icon:'❄️',sky:['#65b9df','#e6f8ff'],hill:'#a6d9e9',ground:'#6ba7b8',dirt:'#547b91',accent:'#b9f4ff'}
+];
+const levelsPerWorld=4;
+const el=id=>document.getElementById(id);
+function resize(){dpr=Math.min(2,devicePixelRatio||1);canvas.width=innerWidth*dpr;canvas.height=innerHeight*dpr;W=innerWidth;H=innerHeight;c.setTransform(dpr,0,0,dpr,0,0);if(mode==='play')draw()}
+addEventListener('resize',resize);resize();
+function panel(html){el('panel').innerHTML=html;el('overlay').style.display='flex'}
+function hidePanel(){el('overlay').style.display='none'}
+function menu(){
+ mode='menu';
+ panel(`<div style="font-size:48px">🧭🌟🏃</div><h1>mohd-murad-khan</h1><h2>QUEST FOR THE STAR</h2><p class="sub">Explore huge worlds, find secret treasure, power up, defeat monsters and collect the magic stars!</p><div class="worlds"><div class="world"><b>🌿</b>Green Hills</div><div class="world"><b>🏜️</b>Sunset Desert</div><div class="world"><b>❄️</b>Frosty Peaks</div></div><p>🎮 12 levels · 3 worlds · boss battles · power-ups</p><button class="big" id="start">START ADVENTURE</button><div class="tiny">Mobile: ◀ ▶ to move · JUMP to leap · FIRE to shoot<br>Computer: A/D or arrows · Space/W to jump · X to fire</div>`);
+ el('start').onclick=()=>{worldIndex=0;levelIndex=0;coins=0;hearts=3;stars=0;loadLevel();hidePanel();mode='play';last=performance.now();requestAnimationFrame(loop)};
 }
-function updateHud(){uiCoins.textContent=coins;uiLives.textContent=lives}
-const keys={left:false,right:false,jump:false};
-function bind(id,key){const el=document.getElementById(id);const down=e=>{e.preventDefault();keys[key]=true};const up=e=>{e.preventDefault();keys[key]=false};el.addEventListener('pointerdown',down);['pointerup','pointercancel','pointerleave'].forEach(ev=>el.addEventListener(ev,up))}
-bind('left','left');bind('right','right');bind('jump','jump');
-addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight',' ','ArrowUp','a','d','A','D','w','W'].includes(e.key))e.preventDefault();if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A')keys.left=true;if(e.key==='ArrowRight'||e.key==='d'||e.key==='D')keys.right=true;if(e.key===' '||e.key==='ArrowUp'||e.key==='w'||e.key==='W')keys.jump=true});
-addEventListener('keyup',e=>{if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A')keys.left=false;if(e.key==='ArrowRight'||e.key==='d'||e.key==='D')keys.right=false;if(e.key===' '||e.key==='ArrowUp'||e.key==='w'||e.key==='W')keys.jump=false});
-document.getElementById('start').onclick=()=>{reset();playing=true;overlay.style.display='none';last=performance.now();requestAnimationFrame(loop)};
-function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(x-camera,y,w,h)}
-function draw(){
- ctx.clearRect(0,0,W,H);let gy=groundY();
- let grad=ctx.createLinearGradient(0,0,0,H);grad.addColorStop(0,'#65c9f1');grad.addColorStop(1,'#d0f6ff');ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
- ctx.fillStyle='#8cdb8a';for(let i=0;i<9;i++){let x=((i*390-camera*.28)%(W+420))-180;ctx.beginPath();ctx.arc(x,gy+20,150,Math.PI,0);ctx.fill()}
- ctx.fillStyle='#fff';[[.13,.16],[.56,.12],[.83,.22]].forEach(([x,y])=>{let cx=x*W,cy=y*H;ctx.beginPath();ctx.arc(cx,cy,20,0,7);ctx.arc(cx+22,cy-8,27,0,7);ctx.arc(cx+48,cy,19,0,7);ctx.fill()});
- for(const p of platforms){rect(p.x,p.y,p.w,p.h,'#9a6338');rect(p.x,p.y,p.w,8,'#37a83f');for(let x=0;x<p.w;x+=26)rect(p.x+x,p.y+12,13,5,'#754525')}
- for(const c of coinList)if(!c.taken){let x=c.x-camera;if(x>-30&&x<W+30){ctx.fillStyle='#ffcf27';ctx.beginPath();ctx.ellipse(x,c.y,9,13,0,0,7);ctx.fill();ctx.strokeStyle='#e68b0a';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#fff1a0';ctx.fillRect(x-2,c.y-8,3,8)}}
- for(const e of enemies)if(e.alive){let x=e.x-camera;ctx.fillStyle='#7b4bc4';ctx.beginPath();ctx.ellipse(x,e.y,17,14,0,0,7);ctx.fill();ctx.fillStyle='white';ctx.fillRect(x-8,e.y-5,5,6);ctx.fillRect(x+4,e.y-5,5,6);ctx.fillStyle='#222';ctx.fillRect(x-6,e.y-3,2,3);ctx.fillRect(x+6,e.y-3,2,3)}
- let gx=goal.x-camera;ctx.fillStyle='#68472b';ctx.fillRect(gx,goal.y,8,gy-goal.y);ctx.fillStyle='#ffd43b';ctx.beginPath();ctx.moveTo(gx+8,goal.y);ctx.lineTo(gx+65,goal.y+18);ctx.lineTo(gx+8,goal.y+38);ctx.fill();
- let px=player.x-camera,py=player.y;ctx.fillStyle=player.inv>0?'#fff':'#ef9b45';ctx.fillRect(px+5,py+18,26,28);ctx.fillStyle='#f6c89b';ctx.fillRect(px+7,py+4,24,20);ctx.fillStyle='#6b3822';ctx.fillRect(px+4,py,29,9);ctx.fillRect(px+2,py+7,7,8);ctx.fillStyle='#24354b';ctx.fillRect(px+(player.face>0?23:9),py+11,4,5);ctx.fillStyle='#2f68b2';ctx.fillRect(px+5,py+28,26,11);ctx.fillStyle='#51311d';ctx.fillRect(px+3,py+42,13,6);ctx.fillRect(px+21,py+42,13,6);
- ctx.fillStyle='#218d39';for(let x=0;x<W;x+=55){ctx.beginPath();ctx.moveTo(x,gy+7);ctx.lineTo(x+8,gy-5);ctx.lineTo(x+13,gy+7);ctx.fill()}
+function makeLevel(){
+ const w=worlds[worldIndex],idx=levelIndex,base=H-82,finish=3000+idx*260;
+ plats=[{x:0,y:base,w:finish+300,h:130,ground:true}];
+ const gaps=[[360,90],[790,110],[1320,95],[1880,110],[2440,100]];
+ gaps.forEach(([x,g])=>{plats[0]});
+ // floating platforms and stepping stones
+ for(let i=0;i<11+idx;i++){let x=220+i*245+(i%3)*35,y=base-(85+(i%4)*34);plats.push({x,y,w:105+(i%2)*35,h:18});}
+ // raised bridges over some sections
+ for(let i=0;i<4;i++){let x=540+i*690;plats.push({x,y:base-45-(i%2)*25,w:125,h:18})}
+ foes=[];for(let i=0;i<8+idx;i++){let x=430+i*330;foes.push({x,home:x,y:base-27,r:17,v:i%2? -1:1,hp:1,alive:true,type:i%4===3?'spike':'slime'})}
+ loot=[];for(let i=0;i<35;i++){let x=170+i*91,y=base-48-(i%5===2?125:0);loot.push({x,y,taken:false})}
+ powerups=[{x:640,y:base-130,type:'mushroom',taken:false},{x:1530,y:base-165,type:'shield',taken:false},{x:2200,y:base-150,type:'star',taken:false}];
+ boss=idx===levelsPerWorld-1?{x:finish-330,y:base-46,hp:12,max:12,dir:1,active:false,flash:0}:null;
+ level={width:finish+100,base,finish};levelStart=player?player.x:70;checkpoint=70;
+ player={x:70,y:base-55,w:34,h:50,vx:0,vy:0,on:false,face:1,inv:0,shield:0,power:'none',powerTime:0,fireCooldown:0,anim:0};
+ cam=0;shots=[];particles=[];updateHud();
 }
-function end(win){playing=false;overlay.style.display='flex';overlay.querySelector('h1').textContent=win?'🏆 Level Complete!':'💫 Try Again!';overlay.querySelector('p').textContent=win?`You reached the flag and collected ${coins} coins. Amazing adventure!`:'The slimes got you this time. Give it another try!';overlay.querySelector('button').textContent=win?'PLAY AGAIN':'RETRY'}
-function hurt(){if(player.inv>0)return;lives--;updateHud();player.inv=1.5;player.vy=-330;player.x=Math.max(20,player.x-55);if(lives<=0)end(false)}
+function loadLevel(){world=worlds[worldIndex];makeLevel();el('worldname').textContent=`${world.icon} ${world.name} · ${worldIndex+1}-${levelIndex+1}`;draw()}
+function updateHud(){el('coins').textContent=coins;el('hearts').textContent=hearts;el('stars').textContent=stars;el('progress').style.width=(player?Math.min(100,player.x/level.width*100):0)+'%'}
+const input={left:false,right:false,jump:false,fire:false};
+function bind(id,k){let b=el(id);let dn=e=>{e.preventDefault();input[k]=true};let up=e=>{e.preventDefault();input[k]=false};b.addEventListener('pointerdown',dn);['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev,up))}
+bind('left','left');bind('right','right');bind('jump','jump');bind('fire','fire');
+addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight',' ','ArrowUp','a','d','A','D','w','W','x','X'].includes(e.key))e.preventDefault();if(['ArrowLeft','a','A'].includes(e.key))input.left=true;if(['ArrowRight','d','D'].includes(e.key))input.right=true;if([' ','ArrowUp','w','W'].includes(e.key))input.jump=true;if(['x','X'].includes(e.key))input.fire=true});
+addEventListener('keyup',e=>{if(['ArrowLeft','a','A'].includes(e.key))input.left=false;if(['ArrowRight','d','D'].includes(e.key))input.right=false;if([' ','ArrowUp','w','W'].includes(e.key))input.jump=false;if(['x','X'].includes(e.key))input.fire=false});
+el('pause').onclick=()=>{if(mode!=='play')return;mode='pause';panel(`<h1>⏸️ Paused</h1><p class="sub">Take a breather, adventurer.</p><div class="row"><button class="big" id="resume">RESUME</button><button class="secondary" id="quit">LEVEL SELECT</button></div>`);el('resume').onclick=()=>{hidePanel();mode='play';last=performance.now();requestAnimationFrame(loop)};el('quit').onclick=worldSelect};
+function worldSelect(){mode='select';panel(`<h1>🗺️ Choose a world</h1><p class="sub">Your adventure has only just begun!</p><div class="worlds">${worlds.map((w,i)=>`<button class="world ${i>worldIndex?'locked':''}" data-w="${i}" ${i>worldIndex?'disabled':''}><b>${w.icon}</b>${w.name}</button>`).join('')}</div><button class="secondary" id="back">BACK</button>`);document.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{worldIndex=+b.dataset.w;levelIndex=0;loadLevel();hidePanel();mode='play';last=performance.now();requestAnimationFrame(loop)});el('back').onclick=()=>{hidePanel();mode='play';last=performance.now();requestAnimationFrame(loop)}}
+function levelComplete(){mode='complete';stars++;updateHud();panel(`<div style="font-size:52px">🏆</div><h1>LEVEL CLEAR!</h1><p class="sub">You found the path through ${world.name}. Coins collected: ${coins} · Stars: ${stars}</p><button class="big" id="next">NEXT LEVEL ➜</button><div class="tiny">Your progress continues in the next stage.</div>`);el('next').onclick=()=>{if(levelIndex<levelsPerWorld-1)levelIndex++;else if(worldIndex<worlds.length-1){worldIndex++;levelIndex=0}else{gameWon();return}loadLevel();hidePanel();mode='play';last=performance.now();requestAnimationFrame(loop)}}
+function gameWon(){mode='won';panel(`<div style="font-size:55px">👑🌟</div><h1>YOU SAVED THE KINGDOM!</h1><p class="sub">All three worlds conquered. You collected ${coins} coins and earned ${stars} stars. Legendary adventuring!</p><button class="big" id="again">PLAY AGAIN</button>`);el('again').onclick=menu}
+function gameOver(){mode='over';panel(`<div style="font-size:48px">💫</div><h1>ADVENTURE OVER</h1><p class="sub">The monsters were tough! Try the level again and watch your jumps.</p><button class="big" id="retry">RETRY LEVEL</button><div class="row"><button class="secondary" id="select">WORLD SELECT</button></div>`);el('retry').onclick=()=>{hearts=3;loadLevel();hidePanel();mode='play';last=performance.now();requestAnimationFrame(loop)};el('select').onclick=worldSelect}
+function burst(x,y,color,n=8){for(let i=0;i<n;i++)particles.push({x,y,vx:(Math.random()-.5)*220,vy:-Math.random()*220,life:.5,color})}
+function hurt(){if(player.inv>0)return;if(player.shield>0){player.shield=0;player.inv=1.2;burst(player.x,player.y,'#73eaff',12);return}hearts--;updateHud();player.inv=1.5;player.vy=-300;player.x=Math.max(checkpoint,player.x-85);if(hearts<=0)gameOver()}
+function shoot(){if(player.fireCooldown>0)return;player.fireCooldown=.42;shots.push({x:player.x+player.w/2+player.face*20,y:player.y+25,vx:player.face*470,life:1.3})}
 function update(dt){
- const speed=245,gravity=1050;player.vx=((keys.right?1:0)-(keys.left?1:0))*speed;if(player.vx)player.face=Math.sign(player.vx);
- if(keys.jump&&player.on){player.vy=-510;player.on=false}player.vy+=gravity*dt;
- let oldY=player.y;player.x=Math.max(0,Math.min(worldW-player.w,player.x+player.vx*dt));player.y+=player.vy*dt;player.on=false;
- for(const p of platforms)if(player.x+player.w>p.x&&player.x<p.x+p.w&&oldY+player.h<=p.y+8&&player.y+player.h>=p.y&&player.vy>=0){player.y=p.y-player.h;player.vy=0;player.on=true}
- if(player.y>H+80){hurt();player.y=groundY()-100}
- if(player.inv>0)player.inv-=dt;
- for(const c of coinList)if(!c.taken&&Math.abs(player.x+18-c.x)<24&&Math.abs(player.y+22-c.y)<28){c.taken=true;coins++;updateHud()}
- for(const e of enemies)if(e.alive){e.x+=e.v*90*dt;if(e.x<e.home-90||e.x>e.home+90)e.v*=-1;
- if(player.x+player.w>e.x-15&&player.x<e.x+15&&player.y+player.h>e.y-15&&player.y<e.y+12){if(player.vy>80&&player.y+player.h<e.y+12){e.alive=false;player.vy=-360}else hurt()}}
- if(player.x+player.w>goal.x){end(true)}
- camera=Math.max(0,Math.min(worldW-W,player.x-W*.38));
+ const p=player,base=level.base;p.anim+=dt*10;p.vx=((input.right?1:0)-(input.left?1:0))*260;if(p.vx)p.face=Math.sign(p.vx);
+ if(input.jump&&p.on){p.vy=-555;p.on=false;burst(p.x+17,p.y+48,'#fff2a6',3)}
+ p.vy+=1250*dt;let old=p.y;p.x=Math.max(0,Math.min(level.width-p.w,p.x+p.vx*dt));p.y+=p.vy*dt;p.on=false;
+ for(const q of plats)if(p.x+p.w>q.x&&p.x<q.x+q.w&&old+p.h<=q.y+9&&p.y+p.h>=q.y&&p.vy>=0){p.y=q.y-p.h;p.vy=0;p.on=true}
+ if(p.y>H+100){hurt();p.y=base-150;p.vy=0}
+ p.inv=Math.max(0,p.inv-dt);p.shield=Math.max(0,p.shield-dt);p.powerTime=Math.max(0,p.powerTime-dt);p.fireCooldown=Math.max(0,p.fireCooldown-dt);
+ if(p.powerTime===0&&p.power!=='none')p.power='none';
+ for(const l of loot)if(!l.taken&&Math.abs(p.x+17-l.x)<24&&Math.abs(p.y+24-l.y)<28){l.taken=true;coins++;burst(l.x,l.y,'#ffd34d',5)}
+ for(const u of powerups)if(!u.taken&&Math.abs(p.x+17-u.x)<27&&Math.abs(p.y+25-u.y)<32){u.taken=true;if(u.type==='mushroom'){p.power='big';p.powerTime=15;p.vy=-260}else if(u.type==='shield')p.shield=10;else{p.power='star';p.powerTime=8}burst(u.x,u.y,'#fff',14)}
+ if(input.fire&&p.power!=='none')shoot();
+ for(const e of foes)if(e.alive){e.x+=e.v*95*dt;if(e.x<e.home-95||e.x>e.home+95)e.v*=-1;if(p.x+p.w>e.x-17&&p.x<e.x+17&&p.y+p.h>e.y-17&&p.y<e.y+13){if(p.vy>90&&p.y+p.h<e.y+15){e.alive=false;p.vy=-390;coins+=2;burst(e.x,e.y,'#cba4ff',12)}else hurt()}}
+ if(boss){if(p.x>level.finish-700)boss.active=true;if(boss.active){boss.x+=boss.dir*105*dt;if(boss.x<level.finish-500||boss.x>level.finish-140)boss.dir*=-1;if(boss.flash>0)boss.flash-=dt;if(p.x+p.w>boss.x-40&&p.x<boss.x+40&&p.y+p.h>boss.y-35&&p.y<boss.y+20){if(p.vy>80&&p.y+p.h<boss.y+22){boss.hp-=2;p.vy=-430;boss.flash=.18;burst(boss.x,boss.y,'#ffcf48',13)}else hurt()}for(const s of shots){if(Math.abs(s.x-boss.x)<35&&Math.abs(s.y-boss.y)<40){boss.hp--;s.life=0;boss.flash=.15;burst(boss.x,boss.y,'#ffcf48',8)}}if(boss.hp<=0){burst(boss.x,boss.y,'#ffd34d',35);boss=null;coins+=20}}}
+ for(const s of shots){s.x+=s.vx*dt;s.life-=dt;for(const e of foes)if(e.alive&&Math.abs(s.x-e.x)<22&&Math.abs(s.y-e.y)<26){e.alive=false;s.life=0;burst(e.x,e.y,'#cba4ff',9)}}shots=shots.filter(s=>s.life>0);
+ for(const a of particles){a.x+=a.vx*dt;a.y+=a.vy*dt;a.vy+=500*dt;a.life-=dt}particles=particles.filter(a=>a.life>0);
+ if(p.x>checkpoint+650)checkpoint=p.x-120;
+ if(p.x+p.w>level.finish&&(!boss||boss.hp<=0)){levelComplete();return}
+ cam=Math.max(0,Math.min(level.width-W,p.x-W*.38));updateHud();
 }
-function loop(t){if(!playing)return;let dt=Math.min(.033,(t-last)/1000);last=t;update(dt);draw();if(playing)requestAnimationFrame(loop)}
-reset();draw();
+function rr(x,y,w,h,r,color){c.fillStyle=color;c.beginPath();c.roundRect(x,y,w,h,r);c.fill()}
+function draw(){
+ c.clearRect(0,0,W,H);let g=world.sky,grad=c.createLinearGradient(0,0,0,H);grad.addColorStop(0,g[0]);grad.addColorStop(1,g[1]);c.fillStyle=grad;c.fillRect(0,0,W,H);
+ // sun and clouds
+ c.fillStyle='#fff8';for(let i=0;i<6;i++){let x=((i*310-cam*.18)%(W+240)+W+240)%(W+240)-100,y=75+(i%3)*50;c.beginPath();c.arc(x,y,18,0,7);c.arc(x+24,y-9,26,0,7);c.arc(x+51,y,18,0,7);c.fill()}
+ c.fillStyle=world.hill;for(let i=0;i<10;i++){let x=((i*360-cam*.32)%(W+400)+W+400)%(W+400)-180;c.beginPath();c.arc(x,level.base+15,155,Math.PI,0);c.fill()}
+ // platforms
+ for(const q of plats){let x=q.x-cam;if(x+q.w<0||x>W)continue;rr(x,q.y,q.w,q.h,5,world.dirt);rr(x,q.y,q.w,9,4,world.ground);c.fillStyle='#ffffff22';for(let a=12;a<q.w-10;a+=29)c.fillRect(x+a,q.y+12,12,3)}
+ // coins
+ for(const l of loot)if(!l.taken){let x=l.x-cam;if(x>-20&&x<W+20){c.fillStyle=world.accent;c.beginPath();c.ellipse(x,l.y,9,13,0,0,7);c.fill();c.strokeStyle='#fff5b5';c.lineWidth=2;c.stroke()}}
+ // powerups
+ for(const u of powerups)if(!u.taken){let x=u.x-cam;c.font='27px system-ui';c.textAlign='center';c.fillText(u.type==='mushroom'?'🍄':u.type==='shield'?'🛡️':'⭐',x,u.y+10)}
+ // enemies
+ for(const e of foes)if(e.alive){let x=e.x-cam;c.fillStyle=e.type==='spike'?'#b94a4a':'#8450c7';c.beginPath();c.ellipse(x,e.y,18,15,0,0,7);c.fill();c.fillStyle='white';c.fillRect(x-9,e.y-5,5,6);c.fillRect(x+4,e.y-5,5,6);c.fillStyle='#18263a';c.fillRect(x-7,e.y-3,2,3);c.fillRect(x+6,e.y-3,2,3)}
+ // boss
+ if(boss){let x=boss.x-cam;rr(x-39,boss.y-34,78,55,18,boss.flash>0?'#fff':'#9d3f50');c.fillStyle='#fff';c.fillRect(x-19,boss.y-19,10,12);c.fillRect(x+9,boss.y-19,10,12);c.fillStyle='#1c2535';c.fillRect(x-16,boss.y-15,4,7);c.fillRect(x+12,boss.y-15,4,7);rr(x-45,boss.y-52,90,9,4,'#3a202c');rr(x-45,boss.y-52,90*boss.hp/boss.max,9,4,'#ff5252');c.fillStyle='#fff';c.font='bold 11px system-ui';c.textAlign='center';c.fillText('MEGA SLIME',x,boss.y-59)}
+ // flag
+ let fx=level.finish-cam;c.fillStyle='#69472c';c.fillRect(fx,level.base-140,9,140);c.fillStyle='#ffdc45';c.beginPath();c.moveTo(fx+9,level.base-140);c.lineTo(fx+75,level.base-119);c.lineTo(fx+9,level.base-97);c.fill();
+ // shots
+ for(const s of shots){c.fillStyle='#ff7043';c.beginPath();c.arc(s.x-cam,s.y,8,0,7);c.fill();c.fillStyle='#ffe58a';c.beginPath();c.arc(s.x-cam,s.y,4,0,7);c.fill()}
+ // player
+ let p=player,x=p.x-cam,y=p.y;if(p.inv>0&&Math.floor(performance.now()/90)%2===0)c.globalAlpha=.45;
+ if(p.shield>0){c.strokeStyle='#70eaff';c.lineWidth=4;c.beginPath();c.arc(x+17,y+25,32,0,7);c.stroke()}
+ if(p.power==='star'){c.shadowColor='#ffe34c';c.shadowBlur=18}
+ let ht=p.power==='big'?60:50;rr(x+4,y+17,p.w-8,ht-20,8,'#e99a43');rr(x+7,y+3,p.w-14,25,8,'#f3c49b');rr(x+2,y,30,10,5,'#704020');c.fillStyle='#26374d';c.fillRect(x+(p.face>0?23:9),y+12,4,6);rr(x+5,y+ht-13,25,12,4,'#2e68b1');rr(x+2,y+ht-4,14,7,3,'#56331e');rr(x+20,y+ht-4,14,7,3,'#56331e');c.shadowBlur=0;c.globalAlpha=1;
+ // particles
+ for(const a of particles){c.globalAlpha=Math.max(0,a.life*2);c.fillStyle=a.color;c.fillRect(a.x-cam,a.y,5,5)}c.globalAlpha=1;
+ // boss hint
+ if(boss&&boss.active){c.fillStyle='#321b2cbb';rr(W/2-95,69,190,25,10,'#321b2cbb');c.fillStyle='white';c.font='bold 12px system-ui';c.textAlign='center';c.fillText('BOSS HEALTH',W/2,86)}
+}
+function loop(t){if(mode!=='play')return;let dt=Math.min(.032,(t-last)/1000);last=t;update(dt);draw();if(mode==='play')requestAnimationFrame(loop)}
+menu();draw();
 })();
 </script>
 </body>
