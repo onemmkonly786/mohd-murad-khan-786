@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Little Adventurer — Green Grass World</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#142b43;font-family:system-ui,Arial;color:#fff;touch-action:none}
+#game{display:block;width:100vw;height:100dvh;background:#79d7f2;touch-action:none}
+#hud{position:fixed;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none;font-weight:800;text-shadow:0 2px 3px #245}
+.pill{background:#153b36c9;border:2px solid #ffffff70;border-radius:18px;padding:7px 12px;font-size:14px}
+#controls{position:fixed;left:0;right:0;bottom:18px;display:flex;justify-content:space-between;align-items:end;padding:0 20px;pointer-events:none}
+.pad{display:flex;gap:12px}.control{pointer-events:auto;width:68px;height:68px;border:3px solid #fff9;border-radius:22px;background:#163d54b9;color:white;font-size:28px;font-weight:900;box-shadow:0 5px 0 #09283b;touch-action:none;user-select:none}
+#jump{width:82px;height:82px;border-radius:50%;background:#ed8b27d9;font-size:17px}
+#overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#061b2bbd;padding:20px}
+.panel{max-width:440px;width:100%;background:linear-gradient(160deg,#246c58,#143c4c);border:3px solid #ffffffa8;border-radius:24px;padding:25px;text-align:center;box-shadow:0 15px 45px #0008}
+.panel h1{font-size:clamp(28px,7vw,42px);margin:0 0 8px}.panel p{line-height:1.5;color:#e5fff3}.panel button{border:0;border-radius:16px;background:#ffd34e;color:#392b08;padding:14px 25px;font-size:19px;font-weight:900;box-shadow:0 5px 0 #b37d16}
+.small{font-size:12px;opacity:.85;margin-top:14px}
+@media(min-width:800px){#controls{padding:0 42px;bottom:25px}.control{opacity:.75}}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="hud"><div class="pill">🪙 <span id="coins">0</span></div><div class="pill">❤️ <span id="lives">3</span></div><div class="pill">WORLD 1-1</div></div>
+<div id="controls"><div class="pad"><button class="control" id="left" aria-label="Move left">◀</button><button class="control" id="right" aria-label="Move right">▶</button></div><button class="control" id="jump">JUMP</button></div>
+<div id="overlay"><div class="panel"><h1>🌿 Little Adventurer</h1><p>Welcome to the Green Grass World! Run, jump, collect coins and reach the golden flag. Stomp the little slimes from above!</p><button id="start">START ADVENTURE</button><div class="small">Touch ◀ ▶ to move · JUMP to leap<br>Keyboard: A/D or ←/→ · Space to jump</div></div></div>
+<script>
+(()=>{
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+let W=0,H=0,dpr=1,camera=0,last=0,playing=false,coins=0,lives=3;
+const uiCoins=document.getElementById('coins'),uiLives=document.getElementById('lives'),overlay=document.getElementById('overlay');
+function resize(){dpr=Math.max(1,Math.min(2,devicePixelRatio||1));canvas.width=Math.floor(innerWidth*dpr);canvas.height=Math.floor(innerHeight*dpr);W=innerWidth;H=innerHeight;ctx.setTransform(dpr,0,0,dpr,0,0)}
+addEventListener('resize',()=>{resize();draw()});resize();
+const worldW=2600,groundY=()=>H-88;
+let player,platforms,coinList,enemies,goal;
+function reset(){
+ player={x:70,y:groundY()-52,w:36,h:48,vx:0,vy:0,on:false,inv:0,face:1};
+ platforms=[{x:0,y:groundY(),w:worldW,h:100},{x:260,y:groundY()-105,w:130,h:18},{x:475,y:groundY()-165,w:120,h:18},{x:700,y:groundY()-100,w:150,h:18},{x:980,y:groundY()-145,w:145,h:18},{x:1250,y:groundY()-95,w:150,h:18},{x:1530,y:groundY()-165,w:145,h:18},{x:1810,y:groundY()-110,w:150,h:18},{x:2110,y:groundY()-150,w:145,h:18}];
+ coinList=[];[[290,groundY()-145],[350,groundY()-145],[500,groundY()-205],[550,groundY()-205],[740,groundY()-140],[800,groundY()-140],[1020,groundY()-185],[1080,groundY()-185],[1300,groundY()-135],[1360,groundY()-135],[1570,groundY()-205],[1630,groundY()-205],[1850,groundY()-150],[1910,groundY()-150],[2150,groundY()-190],[2210,groundY()-190],[2350,groundY()-100]].forEach(([x,y])=>coinList.push({x,y,taken:false}));
+ enemies=[600,900,1430,1990].map((x,i)=>({x,home:x,y:groundY()-30,v:i%2? -1:1,alive:true}));
+ goal={x:2460,y:groundY()-145};camera=0;coins=0;lives=3;updateHud();
+}
+function updateHud(){uiCoins.textContent=coins;uiLives.textContent=lives}
+const keys={left:false,right:false,jump:false};
+function bind(id,key){const el=document.getElementById(id);const down=e=>{e.preventDefault();keys[key]=true};const up=e=>{e.preventDefault();keys[key]=false};el.addEventListener('pointerdown',down);['pointerup','pointercancel','pointerleave'].forEach(ev=>el.addEventListener(ev,up))}
+bind('left','left');bind('right','right');bind('jump','jump');
+addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight',' ','ArrowUp','a','d','A','D','w','W'].includes(e.key))e.preventDefault();if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A')keys.left=true;if(e.key==='ArrowRight'||e.key==='d'||e.key==='D')keys.right=true;if(e.key===' '||e.key==='ArrowUp'||e.key==='w'||e.key==='W')keys.jump=true});
+addEventListener('keyup',e=>{if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A')keys.left=false;if(e.key==='ArrowRight'||e.key==='d'||e.key==='D')keys.right=false;if(e.key===' '||e.key==='ArrowUp'||e.key==='w'||e.key==='W')keys.jump=false});
+document.getElementById('start').onclick=()=>{reset();playing=true;overlay.style.display='none';last=performance.now();requestAnimationFrame(loop)};
+function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(x-camera,y,w,h)}
+function draw(){
+ ctx.clearRect(0,0,W,H);let gy=groundY();
+ let grad=ctx.createLinearGradient(0,0,0,H);grad.addColorStop(0,'#65c9f1');grad.addColorStop(1,'#d0f6ff');ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+ ctx.fillStyle='#8cdb8a';for(let i=0;i<9;i++){let x=((i*390-camera*.28)%(W+420))-180;ctx.beginPath();ctx.arc(x,gy+20,150,Math.PI,0);ctx.fill()}
+ ctx.fillStyle='#fff';[[.13,.16],[.56,.12],[.83,.22]].forEach(([x,y])=>{let cx=x*W,cy=y*H;ctx.beginPath();ctx.arc(cx,cy,20,0,7);ctx.arc(cx+22,cy-8,27,0,7);ctx.arc(cx+48,cy,19,0,7);ctx.fill()});
+ for(const p of platforms){rect(p.x,p.y,p.w,p.h,'#9a6338');rect(p.x,p.y,p.w,8,'#37a83f');for(let x=0;x<p.w;x+=26)rect(p.x+x,p.y+12,13,5,'#754525')}
+ for(const c of coinList)if(!c.taken){let x=c.x-camera;if(x>-30&&x<W+30){ctx.fillStyle='#ffcf27';ctx.beginPath();ctx.ellipse(x,c.y,9,13,0,0,7);ctx.fill();ctx.strokeStyle='#e68b0a';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#fff1a0';ctx.fillRect(x-2,c.y-8,3,8)}}
+ for(const e of enemies)if(e.alive){let x=e.x-camera;ctx.fillStyle='#7b4bc4';ctx.beginPath();ctx.ellipse(x,e.y,17,14,0,0,7);ctx.fill();ctx.fillStyle='white';ctx.fillRect(x-8,e.y-5,5,6);ctx.fillRect(x+4,e.y-5,5,6);ctx.fillStyle='#222';ctx.fillRect(x-6,e.y-3,2,3);ctx.fillRect(x+6,e.y-3,2,3)}
+ let gx=goal.x-camera;ctx.fillStyle='#68472b';ctx.fillRect(gx,goal.y,8,gy-goal.y);ctx.fillStyle='#ffd43b';ctx.beginPath();ctx.moveTo(gx+8,goal.y);ctx.lineTo(gx+65,goal.y+18);ctx.lineTo(gx+8,goal.y+38);ctx.fill();
+ let px=player.x-camera,py=player.y;ctx.fillStyle=player.inv>0?'#fff':'#ef9b45';ctx.fillRect(px+5,py+18,26,28);ctx.fillStyle='#f6c89b';ctx.fillRect(px+7,py+4,24,20);ctx.fillStyle='#6b3822';ctx.fillRect(px+4,py,29,9);ctx.fillRect(px+2,py+7,7,8);ctx.fillStyle='#24354b';ctx.fillRect(px+(player.face>0?23:9),py+11,4,5);ctx.fillStyle='#2f68b2';ctx.fillRect(px+5,py+28,26,11);ctx.fillStyle='#51311d';ctx.fillRect(px+3,py+42,13,6);ctx.fillRect(px+21,py+42,13,6);
+ ctx.fillStyle='#218d39';for(let x=0;x<W;x+=55){ctx.beginPath();ctx.moveTo(x,gy+7);ctx.lineTo(x+8,gy-5);ctx.lineTo(x+13,gy+7);ctx.fill()}
+}
+function end(win){playing=false;overlay.style.display='flex';overlay.querySelector('h1').textContent=win?'🏆 Level Complete!':'💫 Try Again!';overlay.querySelector('p').textContent=win?`You reached the flag and collected ${coins} coins. Amazing adventure!`:'The slimes got you this time. Give it another try!';overlay.querySelector('button').textContent=win?'PLAY AGAIN':'RETRY'}
+function hurt(){if(player.inv>0)return;lives--;updateHud();player.inv=1.5;player.vy=-330;player.x=Math.max(20,player.x-55);if(lives<=0)end(false)}
+function update(dt){
+ const speed=245,gravity=1050;player.vx=((keys.right?1:0)-(keys.left?1:0))*speed;if(player.vx)player.face=Math.sign(player.vx);
+ if(keys.jump&&player.on){player.vy=-510;player.on=false}player.vy+=gravity*dt;
+ let oldY=player.y;player.x=Math.max(0,Math.min(worldW-player.w,player.x+player.vx*dt));player.y+=player.vy*dt;player.on=false;
+ for(const p of platforms)if(player.x+player.w>p.x&&player.x<p.x+p.w&&oldY+player.h<=p.y+8&&player.y+player.h>=p.y&&player.vy>=0){player.y=p.y-player.h;player.vy=0;player.on=true}
+ if(player.y>H+80){hurt();player.y=groundY()-100}
+ if(player.inv>0)player.inv-=dt;
+ for(const c of coinList)if(!c.taken&&Math.abs(player.x+18-c.x)<24&&Math.abs(player.y+22-c.y)<28){c.taken=true;coins++;updateHud()}
+ for(const e of enemies)if(e.alive){e.x+=e.v*90*dt;if(e.x<e.home-90||e.x>e.home+90)e.v*=-1;
+ if(player.x+player.w>e.x-15&&player.x<e.x+15&&player.y+player.h>e.y-15&&player.y<e.y+12){if(player.vy>80&&player.y+player.h<e.y+12){e.alive=false;player.vy=-360}else hurt()}}
+ if(player.x+player.w>goal.x){end(true)}
+ camera=Math.max(0,Math.min(worldW-W,player.x-W*.38));
+}
+function loop(t){if(!playing)return;let dt=Math.min(.033,(t-last)/1000);last=t;update(dt);draw();if(playing)requestAnimationFrame(loop)}
+reset();draw();
+})();
+</script>
+</body>
+</html>
