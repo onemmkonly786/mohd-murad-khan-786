@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>RIFTBOUND: Chaos Frontier</title>
+<title>MOHD-MURAD-KHAN</title>
 <style>
 :root{--ink:#f4f7ff;--muted:#aebbd5;--panel:rgba(9,15,34,.88);--line:rgba(255,255,255,.16);--cyan:#4de7ff;--gold:#ffd45a}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#070b18;color:var(--ink);font-family:system-ui,Segoe UI,Arial}
@@ -38,7 +38,7 @@ button:hover{filter:brightness(1.18);transform:translateY(-1px)}
 <div id="toast"></div><div id="help">MOVE: A/D or ←/→ · JUMP: SPACE/W/↑ · DASH: SHIFT · ATTACK: J · SPECIAL: K · PAUSE: P</div>
 <div id="mobile"><div class="pad"><button class="touch" data-key="left">◀</button><button class="touch" data-key="right">▶</button></div><div class="jump"><button class="touch" data-key="dash">⚡</button><button class="touch" data-key="attack">✦</button><button class="touch" data-key="jump">⬆</button></div></div>
 <div id="overlay"><div class="panel" id="menu">
-<div class="eyebrow">A BRAND-NEW ADVENTURE</div><h1>RIFTBOUND:<br>CHAOS FRONTIER</h1>
+<div class="eyebrow">A BRAND-NEW ADVENTURE</div><h1>MOHD-MURAD-KHAN</h1>
 <p class="sub">A fractured universe. Five worlds. Five colossal guardians. Master new powers, uncover hidden routes, and fight your way to the heart of the rift.</p>
 <div class="grid">
 <div class="tile"><b>🌿 Verdant Wilds</b><span>Living vines, spring pads & thorn beasts</span></div>
@@ -66,7 +66,7 @@ function beginLevel(){world=Math.floor(level/5);let stage=level%5;cam=0;frame=0;
 let width=2400+stage*180;exitX=width-120;platforms=[{x:0,y:H-65,w:width,h:100,type:'ground'}];
 for(let i=0;i<Math.floor(width/240);i++){let x=230+i*240+Math.sin(i*2+level)*35,y=H-145-(i%3)*47;platforms.push({x,y,w:110+(i%2)*30,h:18,type:'platform'});if(i%2===0)items.push({x:x+48,y:y-35,type:'shard',got:false});}
 for(let i=0;i<7+stage;i++){let x=400+i*230+Math.random()*80;enemies.push({x,y:H-100,hp:2+world,type:world,dir:Math.random()<.5?-1:1,alive:true,base:x});}
-if(stage===4){boss={x:width-420,y:H-180,hp:18+world*8,max:18+world*8,phase:0,hit:0,attack:0};}
+if(stage===4){boss={x:width-420,y:H-180,hp:32+world*12,max:32+world*12,phase:0,hit:0,attack:0};}
 for(let i=0;i<3;i++)items.push({x:650+i*570,y:H-110,type:'coin',got:false});
 if(stage===1||stage===3)items.push({x:width*.55,y:H-210,type:'power',got:false});
 player={x:70,y:H-150,vx:0,vy:0,w:32,h:46,hp:3,maxHp:3,ground:false,face:1,power:Math.max(0,world-1),powerTime:0,invul:0,dash:0,attack:0,special:0,respawn:70};
@@ -77,7 +77,7 @@ function circle(x,y,r,color){ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r,0
 function burst(x,y,color,n=10){for(let i=0;i<n;i++)particles.push({x,y,vx:(Math.random()-.5)*7,vy:(Math.random()-.7)*7,life:30,color})}
 function hit(){if(player.invul>0)return;player.hp--;player.invul=90;player.vy=-7;burst(player.x+16,player.y+20,'#ff5777',15);updateHud();if(player.hp<=0){lives--;if(lives<=0){gameOver()}else{player.hp=3;player.x=70;player.y=H-180;player.vx=player.vy=0;say('TRY AGAIN · '+lives+' LIVES LEFT')}}}
 function gameOver(){paused=true;overlay.style.display='grid';menu.innerHTML='<div class="eyebrow">THE RIFT STILL WAITS</div><h1>RUN ENDED</h1><p class="sub">You collected '+shards+' rift shards and reached stage '+(level+1)+'. Take a breath and jump back in.</p><div class="actions"><button class="primary" id="retry">RESTART RUN</button><button id="home">MAIN MENU</button></div>';document.getElementById('retry').onclick=()=>{fresh();overlay.style.display='none';paused=false};document.getElementById('home').onclick=showMenu}
-function showMenu(){overlay.style.display='grid';menu.innerHTML='<div class="eyebrow">A BRAND-NEW ADVENTURE</div><h1>RIFTBOUND:<br>CHAOS FRONTIER</h1><p class="sub">Five worlds. Five colossal guardians. Master new powers and fight your way to the heart of the rift.</p><div class="actions"><button class="primary" id="start">START NEW GAME</button><button id="continue">CONTINUE</button><button id="controls">HOW TO PLAY</button></div><p class="sub" style="font-size:12px">25 stages · 5 bosses · 5 powers · secrets and checkpoints.</p>';document.getElementById('start').onclick=()=>{fresh();overlay.style.display='none';started=true};document.getElementById('continue').onclick=()=>{let s=load();if(s){level=Math.min(24,s.level);score=s.score||0;shards=s.shards||0;lives=s.lives||3;beginLevel();overlay.style.display='none';started=true}else say('NO SAVE FOUND YET')};document.getElementById('controls').onclick=()=>{menu.innerHTML='<h2>HOW TO PLAY</h2><p class="sub">Move with A/D or arrows. Jump with SPACE, W or ↑. Press SHIFT to dash, J to attack and K for your world power. On phones, use the on-screen buttons. Collect rift shards, grab power cores, defeat the guardian at the end of each world, then enter the portal.</p><div class="actions"><button class="primary" id="back">GOT IT</button></div>';document.getElementById('back').onclick=showMenu}}
+function showMenu(){overlay.style.display='grid';menu.innerHTML='<div class="eyebrow">A BRAND-NEW ADVENTURE</div><h1>MOHD-MURAD-KHAN</h1><p class="sub">Five worlds. Five colossal guardians. Master new powers and fight your way to the heart of the rift.</p><div class="actions"><button class="primary" id="start">START NEW GAME</button><button id="continue">CONTINUE</button><button id="controls">HOW TO PLAY</button></div><p class="sub" style="font-size:12px">25 stages · 5 bosses · 5 powers · secrets and checkpoints.</p>';document.getElementById('start').onclick=()=>{fresh();overlay.style.display='none';started=true};document.getElementById('continue').onclick=()=>{let s=load();if(s){level=Math.min(24,s.level);score=s.score||0;shards=s.shards||0;lives=s.lives||3;beginLevel();overlay.style.display='none';started=true}else say('NO SAVE FOUND YET')};document.getElementById('controls').onclick=()=>{menu.innerHTML='<h2>HOW TO PLAY</h2><p class="sub">Move with A/D or arrows. Jump with SPACE, W or ↑. Press SHIFT to dash, J to attack and K for your world power. On phones, use the on-screen buttons. Collect rift shards, grab power cores, defeat the guardian at the end of each world, then enter the portal.</p><div class="actions"><button class="primary" id="back">GOT IT</button></div>';document.getElementById('back').onclick=showMenu}}
 function action(k){if(!started||paused)return;if(k==='jump'&&player.ground){player.vy=-13.5;player.ground=false;burst(player.x+16,player.y+45,'#d9faff',4)}if(k==='dash'&&player.dash<=0){player.dash=13;player.vx=player.face*15;burst(player.x+16,player.y+20,themes[world][3],9)}if(k==='attack'&&player.attack<=0){player.attack=18;if(player.power===1||player.power===4){projectiles.push({x:player.x+player.w/2,y:player.y+20,vx:player.face*9,life:75,power:player.power})}else{enemies.forEach(e=>{if(e.alive&&Math.abs(e.x-player.x)<75&&Math.abs(e.y-player.y)<80){e.hp-=2;burst(e.x,e.y,'#fff',7);if(e.hp<=0){e.alive=false;score+=100}}});if(boss&&Math.abs(boss.x-player.x)<100&&Math.abs(boss.y-player.y)<100){boss.hp-=2;boss.hit=12}}}if(k==='special'&&player.special<=0){player.special=240;let radius=world===4?250:145;enemies.forEach(e=>{if(e.alive&&Math.abs(e.x-player.x)<radius){e.hp-=4;if(e.hp<=0)e.alive=false}});if(boss&&Math.abs(boss.x-player.x)<radius)boss.hp-=world===4?5:3;burst(player.x+16,player.y+20,themes[world][3],35);say(powers[world][0]+'!')}}
 addEventListener('keydown',e=>{let k=e.key.toLowerCase();keys[k]=true;if([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k))e.preventDefault();if(k===' '||k==='w'||k==='arrowup')action('jump');if(k==='shift')action('dash');if(k==='j')action('attack');if(k==='k')action('special');if(k==='p'){paused=!paused;say(paused?'PAUSED':'RESUMED')}});
 addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
@@ -89,10 +89,34 @@ if(player.x<0)player.x=0;if(player.y>H+120){hit();player.x=Math.max(70,player.x-
 if(player.invul>0)player.invul--;if(player.powerTime>0)player.powerTime--;if(player.attack>0)player.attack--;if(player.special>0)player.special--;
 for(let e of enemies){if(!e.alive)continue;e.x+=e.dir*(1.1+world*.25);if(Math.abs(e.x-e.base)>85)e.dir*=-1;if(Math.abs(player.x-e.x)<28&&Math.abs(player.y-e.y)<42){if(player.vy>2&&player.y+player.h<e.y+22){e.hp-=2;player.vy=-8;if(e.hp<=0){e.alive=false;score+=100}}else hit()}}
 for(let it of items){if(it.got)continue;if(Math.abs(player.x+16-it.x)<25&&Math.abs(player.y+22-it.y)<35){it.got=true;if(it.type==='shard'){shards++;score+=25;burst(it.x,it.y,'#ffe36e',8)}else if(it.type==='coin'){score+=50;burst(it.x,it.y,'#ffd45a',8)}else{player.power=world;player.powerTime=9999;player.hp=Math.min(3,player.hp+1);say('POWER UNLOCKED: '+powers[world][0]);burst(it.x,it.y,themes[world][3],20)}updateHud()}}
-for(let p of projectiles){p.x+=p.vx;p.life--;for(let e of enemies)if(e.alive&&Math.abs(e.x-p.x)<28){e.hp-=2;p.life=0;if(e.hp<=0){e.alive=false;score+=100}}if(boss&&Math.abs(boss.x-p.x)<55){boss.hp-=2;p.life=0}}
+// Only the player's friendly shots can damage enemies or the boss.
+for(let p of projectiles){
+ if(p.enemy) continue;
+ p.x+=p.vx;p.life--;
+ for(let e of enemies)if(e.alive&&Math.abs(e.x-p.x)<28){e.hp-=2;p.life=0;if(e.hp<=0){e.alive=false;score+=100}}
+ if(boss&&Math.abs(boss.x-p.x)<55&&Math.abs((boss.y+45)-p.y)<90){boss.hp-=2;p.life=0;burst(p.x,p.y,'#fff19a',5)}
+}
 projectiles=projectiles.filter(p=>p.life>0);
-if(boss){boss.attack++;boss.x+=Math.sin(frame*.025)*.8;if(boss.attack%100===0){let dx=player.x-boss.x,dy=player.y-boss.y;let mag=Math.hypot(dx,dy)||1;projectiles.push({x:boss.x,y:boss.y+25,vx:dx/mag*4,vy:dy/mag*2,life:100,enemy:true})}if(Math.abs(player.x-boss.x)<65&&Math.abs(player.y-boss.y)<80)hit();document.getElementById('bossname').textContent=bossNames[world]+' · '+Math.ceil(boss.hp)+' HP';document.getElementById('bossfill').style.width=Math.max(0,boss.hp/boss.max*100)+'%';if(boss.hp<=0){boss=null;document.getElementById('bossbar').style.display='none';score+=1500;say('GUARDIAN DEFEATED! POWER CORE CLAIMED');shards+=10;updateHud();saved()}}
-for(let p of projectiles)if(p.enemy){p.x+=p.vx;p.y+=p.vy;if(Math.abs(player.x-p.x)<25&&Math.abs(player.y-p.y)<35){hit();p.life=0}}projectiles=projectiles.filter(p=>p.life>0);
+if(boss){
+ boss.attack++;
+ boss.x+=Math.sin(frame*.025)*.8;
+ // The guardian fires aimed shots at the player, never at itself.
+ if(boss.attack%100===0){
+  let dx=(player.x+player.w/2)-boss.x,dy=(player.y+player.h/2)-(boss.y+35),mag=Math.hypot(dx,dy)||1;
+  projectiles.push({x:boss.x,y:boss.y+35,vx:dx/mag*4.2,vy:dy/mag*4.2,life:110,enemy:true});
+  say('GUARDIAN ATTACK! DODGE!');
+ }
+ if(Math.abs(player.x-boss.x)<65&&Math.abs(player.y-boss.y)<80)hit();
+ document.getElementById('bossname').textContent=bossNames[world]+' · '+Math.ceil(boss.hp)+' HP';
+ document.getElementById('bossfill').style.width=Math.max(0,boss.hp/boss.max*100)+'%';
+ if(boss.hp<=0){boss=null;document.getElementById('bossbar').style.display='none';score+=1500;say('GUARDIAN DEFEATED! POWER CORE CLAIMED');shards+=10;updateHud();saved()}
+}
+// Enemy shots move separately and can only hit the player.
+for(let p of projectiles)if(p.enemy){
+ p.x+=p.vx;p.y+=p.vy;p.life--;
+ if(Math.abs(player.x+player.w/2-p.x)<25&&Math.abs(player.y+player.h/2-p.y)<35){hit();p.life=0}
+}
+projectiles=projectiles.filter(p=>p.life>0);
 for(let p of particles){p.x+=p.vx;p.y+=p.vy;p.vy+=.12;p.life--}particles=particles.filter(p=>p.life>0);
 if(player.x>exitX&&(!boss)){level++;if(level>=25){victory();return}beginLevel();say('WORLD '+(world+1)+' · STAGE '+(level+1));}
 cam=Math.max(0,Math.min(exitX-W*.65,player.x-W*.32));if(toastTimer>0){toastTimer--;if(toastTimer===0)document.getElementById('toast').style.opacity=0}if(frame%180===0)saved();updateHud()}
